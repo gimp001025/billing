@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>과금 관리 시스템</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --border: #e2e5ec;
+    --border-soft: #eef0f5;
+    --text: #1a1d23;
+    --text-secondary: #6b7280;
+    --text-hint: #9ca3af;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --green: #1D9E75;
+    --green-light: #EAF3DE;
+    --orange-bg: #fce8d8;
+    --blue-bg: #dde8f0;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* 헤더 */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .site-header span {
+    font-size: 12px;
+    color: var(--text-hint);
+    margin-left: 10px;
+  }
+
+  /* 레이아웃 */
+  .container { max-width: 1300px; margin: 0 auto; padding: 1.5rem 1.5rem; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* 툴바 */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .toolbar label { font-size: 13px; color: var(--text-secondary); }
+  .toolbar select, .toolbar input[type="text"] {
+    padding: 7px 11px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .toolbar select:focus, .toolbar input:focus { border-color: var(--blue); }
+
+  /* 테이블 공통 */
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  table { border-collapse: collapse; width: 100%; min-width: 960px; font-size: 13px; }
+  th, td { border-bottom: 1px solid var(--border-soft); padding: 9px 12px; text-align: center; white-space: nowrap; }
+  th { font-size: 11px; font-weight: 600; color: var(--text-secondary); background: #fafbfc; }
+  td { color: var(--text); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #fafbfd; }
+
+  /* 그룹 헤더 */
+  .th-erp { background: #e8f1f8 !important; color: #185FA5 !important; }
+  .th-fee { background: #fdeede !important; color: #8B3A10 !important; }
+  .th-erp-group { background: #dde8f0 !important; color: #185FA5 !important; }
+  .th-fee-group { background: #fce8d8 !important; color: #8B3A10 !important; }
+
+  /* 링크 스타일 */
+  .name-link { color: var(--blue); cursor: pointer; font-weight: 500; text-decoration: underline; text-decoration-style: dotted; }
+  .amt-link { color: var(--blue); cursor: pointer; font-weight: 600; }
+  .amt-link:hover { text-decoration: underline; }
+
+  /* 뱃지 */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge-user { background: var(--blue-light); color: #0C447C; }
+  .badge-fixed { background: var(--green-light); color: #27500A; }
+
+  /* 팝업 오버레이 */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: min(580px, 100%);
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+  }
+  .modal-hd {
+    padding: .9rem 1.2rem .75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 2;
+  }
+  .modal-hd-title { font-size: 15px; font-weight: 600; }
+  .close-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-secondary); font-size: 22px; line-height: 1; padding: 0 4px;
+    border-radius: 4px;
+  }
+  .close-btn:hover { background: var(--bg); }
+  .modal-bd { padding: 1rem 1.2rem 1.2rem; }
+
+  /* 상세 페이지 */
+  .detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.4rem; }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; font-size: 13px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text-secondary); cursor: pointer;
+    transition: background .15s;
+  }
+  .back-btn:hover { background: var(--bg); }
+  .back-btn svg { width: 14px; height: 14px; }
+  .detail-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+
+  /* 기간 선택바 */
+  .range-bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: .75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1.2rem;
+    font-size: 13px;
+  }
+  .range-bar label { color: var(--text-secondary); font-weight: 500; }
+  .range-bar select {
+    padding: 6px 10px; font-size: 13px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); outline: none;
+  }
+  .range-bar select:focus { border-color: var(--blue); }
+  .range-note { font-size: 12px; color: var(--text-hint); }
+
+  /* 메트릭 카드 */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 1.4rem; }
+  .metric {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+  }
+  .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
+  .metric-value { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .metric-sub { font-size: 11px; color: var(--text-hint); margin-top: 3px; }
+
+  /* 섹션 */
+  .sec { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 1.3rem 0 .6rem; letter-spacing: .02em; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
+  .card table { min-width: unset; }
+  .card tbody tr:last-child td { border-bottom: none; }
+  .total-row td { font-weight: 600; background: #fafbfc !important; }
+
+  .so { color: var(--green); font-weight: 600; }
+  .sx { color: var(--text-hint); }
+
+  /* 팝업 내 계산 박스 */
+  .calc-box { background: var(--bg); border-radius: var(--radius); padding: 12px 14px; font-size: 13px; }
+  .c-row { display: flex; justify-content: space-between; padding: 4px 0; color: var(--text-secondary); }
+  .c-divider { height: 1px; background: var(--border); margin: 7px 0; }
+  .c-total { display: flex; justify-content: space-between; padding-top: 7px; font-weight: 700; font-size: 15px; color: var(--text); }
+
+  /* 힌트 */
+  .hint { font-size: 11px; color: var(--text-hint); margin-top: 7px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>과금 관리 시스템</h1>
+  <span>업체별 청구 내역 관리</span>
+</header>
+
+<div class="container">
+
+  <!-- 목록 화면 -->
+  <div class="view active" id="view-list">
+    <div class="toolbar">
+      <label>월 조회:</label>
+      <select id="sel-month">
+        <option value="2026-05">2026년 5월</option>
+        <option value="2026-04">2026년 4월</option>
+        <option value="2026-03">2026년 3월</option>
+        <option value="2025-12">2025년 12월</option>
+        <option value="2025-11">2025년 11월</option>
+        <option value="2025-10">2025년 10월</option>
+      </select>
+      <input type="text" id="search" placeholder="업체명 검색..." oninput="renderList()" />
+      <select id="sel-type" onchange="renderList()">
+        <option value="">전체 산정구분</option>
+        <option value="유저수체크">유저수체크</option>
+        <option value="월정액">월정액</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2">업체명</th>
+            <th rowspan="2">사업자명</th>
+            <th rowspan="2">사업자번호</th>
+            <th rowspan="2">산정구분</th>
+            <th colspan="2" class="th-erp-group">ERP 기본 제공 유저</th>
+            <th colspan="4" class="th-fee-group">유저수 추가 요금</th>
+            <th rowspan="2">전산관리비</th>
+            <th rowspan="2">개발 월사용료</th>
+            <th rowspan="2">총 금액</th>
+          </tr>
+          <tr>
+            <th class="th-erp">본사</th>
+            <th class="th-erp">매장(결제X)</th>
+            <th class="th-fee">본사</th>
+            <th class="th-fee">매장(결제X)</th>
+            <th class="th-fee">매장(결제O)</th>
+            <th class="th-fee">태블릿</th>
+          </tr>
+        </thead>
+        <tbody id="list-tbody"></tbody>
+      </table>
+    </div>
+    <p class="hint">※ 업체명 클릭: 상세 팝업 &nbsp;|&nbsp; 총 금액 클릭: 상세 페이지</p>
+
+    <!-- 팝업 -->
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <div class="modal-hd">
+          <span class="modal-hd-title" id="popup-title"></span>
+          <button class="close-btn" onclick="closePopup()" aria-label="닫기">×</button>
+        </div>
+        <div class="modal-bd" id="popup-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상세 랜딩 화면 -->
+  <div class="view" id="view-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>
+        목록으로
+      </button>
+      <span class="detail-title" id="detail-title"></span>
+    </div>
+
+    <div class="range-bar">
+      <label>조회 기간:</label>
+      <select id="detail-from" onchange="renderDetail()">
+        <option value="2025-10">2025년 10월</option>
+        <option value="2025-11">2025년 11월</option>
+        <option value="2025-12">2025년 12월</option>
+        <option value="2026-01">2026년 1월</option>
+        <option value="2026-02">2026년 2월</option>
+        <option value="2026-03">2026년 3월</option>
+        <option value="2026-04">2026년 4월</option>
+        <option value="2026-05" selected>2026년 5월</option>
+      </select>
+      <span style="color:var(--text-hint)">~</span>
+      <select id="detail-to" onchange="renderDetail()">
+        <option value="2025-10">2025년 10월</option>
+        <option value="2025-11">2025년 11월</option>
+        <option value="2025-12">2025년 12월</option>
+        <option value="2026-01">2026년 1월</option>
+        <option value="2026-02">2026년 2월</option>
+        <option value="2026-03">2026년 3월</option>
+        <option value="2026-04">2026년 4월</option>
+        <option value="2026-05" selected>2026년 5월</option>
+      </select>
+      <span class="range-note" id="range-label"></span>
+    </div>
+
+    <div class="metrics" id="detail-metrics"></div>
+
+    <div class="sec">월별 유저 현황</div>
+    <div class="card"><table id="user-table"></table></div>
+
+    <div class="sec">월별 청구 합계</div>
+    <div class="card"><table id="billing-table"></table></div>
+
+    <div class="sec">개발 내역 (추가 월사용료)</div>
+    <div class="card"><table id="dev-table"></table></div>
+  </div>
+
+</div>
+
+<script>
+const MONTHS = ["2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05"];
+
+const companies = [
+  {
+    id:1, name:"A업체", bizName:"주A", bizNo:"123456789",
+    type:"유저수체크", erpBonsa:5, erpStore:0,
+    addFee:{bonsa:20000, storeX:30000, storeO:40000, tablet:90000},
+    jeonsan:300000,
+    monthlyUsers:{
+      "2025-10":{bonsa:8,storeX:3,storeO:4,tablet:1},
+      "2025-11":{bonsa:9,storeX:4,storeO:5,tablet:1},
+      "2025-12":{bonsa:9,storeX:4,storeO:5,tablet:2},
+      "2026-01":{bonsa:10,storeX:5,storeO:6,tablet:2},
+      "2026-02":{bonsa:10,storeX:5,storeO:6,tablet:2},
+      "2026-03":{bonsa:10,storeX:5,storeO:6,tablet:2},
+      "2026-04":{bonsa:10,storeX:5,storeO:6,tablet:2},
+      "2026-05":{bonsa:10,storeX:5,storeO:6,tablet:2}
+    },
+    history:[{date:"2025-10-27",desc:"고객관리",devAmt:1500000,monthly:50000,file:"발주서첨부",issued:"O"}]
+  },
+  {
+    id:2, name:"B업체", bizName:"주식회사 B", bizNo:"987654321",
+    type:"월정액", erpBonsa:5, erpStore:0,
+    addFee:{bonsa:20000, storeX:30000, storeO:0, tablet:0},
+    jeonsan:0, fixedAmt:200000,
+    monthlyUsers:{
+      "2025-10":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2025-11":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2025-12":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2026-01":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2026-02":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2026-03":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2026-04":{bonsa:0,storeX:0,storeO:0,tablet:0},
+      "2026-05":{bonsa:0,storeX:0,storeO:0,tablet:0}
+    },
+    history:[{date:"2025-11-01",desc:"재고모듈",devAmt:800000,monthly:30000,file:"",issued:"X"}]
+  }
+];
+
+let currentCompany = null;
+
+function calcForMonth(c, m) {
+  const u = c.monthlyUsers[m] || {bonsa:0,storeX:0,storeO:0,tablet:0};
+  const monthlyDev = c.history.reduce((s,h) => s+(h.monthly||0), 0);
+  if (c.type === "월정액") {
+    const base = c.fixedAmt || 0;
+    return {bonsa:0,storeX:0,storeO:0,tablet:0,base,jeonsan:c.jeonsan,monthly:monthlyDev,total:base+c.jeonsan+monthlyDev,u,diff:{bonsa:0,storeX:0,storeO:0,tablet:0}};
+  }
+  const diff = {
+    bonsa: Math.max(0, u.bonsa - (c.erpBonsa||0)),
+    storeX: Math.max(0, u.storeX - (c.erpStore||0)),
+    storeO: Math.max(0, u.storeO),
+    tablet: Math.max(0, u.tablet)
+  };
+  const bonsa = diff.bonsa * c.addFee.bonsa;
+  const storeX = diff.storeX * c.addFee.storeX;
+  const storeO = diff.storeO * c.addFee.storeO;
+  const tablet = diff.tablet * c.addFee.tablet;
+  const total = bonsa + storeX + storeO + tablet + c.jeonsan + monthlyDev;
+  return {bonsa,storeX,storeO,tablet,jeonsan:c.jeonsan,monthly:monthlyDev,total,u,diff};
+}
+
+function fn(n) { return n === 0 ? "-" : n.toLocaleString(); }
+function fw(n) { return n.toLocaleString() + "원"; }
+function ml(m) { return m.replace("-","년 ") + "월"; }
+
+function renderList() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const t = document.getElementById("sel-type").value;
+  const mon = document.getElementById("sel-month").value;
+  const list = companies.filter(c =>
+    (c.name.toLowerCase().includes(q) || c.bizName.toLowerCase().includes(q)) && (!t || c.type === t)
+  );
+  const tbody = document.getElementById("list-tbody");
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="13" style="padding:2rem;color:#9ca3af;">검색 결과 없음</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(c => {
+    const p = calcForMonth(c, mon);
+    return `<tr>
+      <td><span class="name-link" onclick="openPopup(${c.id})">${c.name}</span></td>
+      <td>${c.bizName}</td>
+      <td style="font-size:12px;color:#6b7280;">${c.bizNo}</td>
+      <td><span class="badge ${c.type==="유저수체크"?"badge-user":"badge-fixed"}">${c.type}</span></td>
+      <td>${c.erpBonsa || "-"}</td>
+      <td>${c.erpStore || "-"}</td>
+      <td>${fn(c.addFee.bonsa)}</td>
+      <td>${fn(c.addFee.storeX)}</td>
+      <td>${fn(c.addFee.storeO) || "-"}</td>
+      <td>${fn(c.addFee.tablet) || "-"}</td>
+      <td>${fn(c.jeonsan)}</td>
+      <td>${fn(p.monthly)}</td>
+      <td><span class="amt-link" onclick="openDetail(${c.id})">${fw(p.total)}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+function openPopup(id) {
+  const c = companies.find(x => x.id === id);
+  const mon = document.getElementById("sel-month").value;
+  const p = calcForMonth(c, mon);
+  document.getElementById("popup-title").textContent = c.name + " — " + ml(mon);
+  let b = `<div style="margin-bottom:.8rem;"><span style="color:#6b7280;font-size:13px;">산정구분: </span><span class="badge ${c.type==="유저수체크"?"badge-user":"badge-fixed"}">${c.type}</span></div>`;
+  b += `<div style="font-size:12px;color:#6b7280;margin-bottom:.5rem;font-weight:600;">이번달 청구 계산</div>`;
+  b += `<div class="calc-box">`;
+  if (c.type === "월정액") {
+    b += `<div class="c-row"><span>월정액 고정요금</span><span>${fw(c.fixedAmt||0)}</span></div>`;
+  } else {
+    const d = p.diff; const u = p.u;
+    b += `<div class="c-row"><span>본사 (기본${c.erpBonsa}→실제${u.bonsa}, 초과${d.bonsa}명 × ${c.addFee.bonsa.toLocaleString()}원)</span><span>${fw(p.bonsa)}</span></div>`;
+    b += `<div class="c-row"><span>매장(결제X) (기본${c.erpStore}→실제${u.storeX}, 초과${d.storeX}명 × ${c.addFee.storeX.toLocaleString()}원)</span><span>${fw(p.storeX)}</span></div>`;
+    b += `<div class="c-row"><span>매장(결제O) (기본0→실제${u.storeO}, 초과${d.storeO}명 × ${c.addFee.storeO.toLocaleString()}원)</span><span>${fw(p.storeO)}</span></div>`;
+    b += `<div class="c-row"><span>태블릿 (기본0→실제${u.tablet}, 초과${d.tablet}명 × ${c.addFee.tablet.toLocaleString()}원)</span><span>${fw(p.tablet)}</span></div>`;
+  }
+  b += `<div class="c-divider"></div>`;
+  b += `<div class="c-row"><span>전산관리비</span><span>${fw(p.jeonsan)}</span></div>`;
+  b += `<div class="c-row"><span>개발 월사용료 합계</span><span>${fw(p.monthly)}</span></div>`;
+  b += `<div class="c-total"><span>청구금액 합계</span><span>${fw(p.total)}</span></div></div>`;
+  document.getElementById("popup-body").innerHTML = b;
+  document.getElementById("overlay").classList.add("show");
+}
+
+function closePopup() { document.getElementById("overlay").classList.remove("show"); }
+document.getElementById("overlay").addEventListener("click", function(e) { if (e.target === this) closePopup(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePopup(); });
+
+function openDetail(id) {
+  currentCompany = companies.find(x => x.id === id);
+  document.getElementById("detail-title").textContent = currentCompany.name + " — 상세 청구 내역";
+  document.getElementById("view-list").classList.remove("active");
+  document.getElementById("view-detail").classList.add("active");
+  window.scrollTo(0, 0);
+  renderDetail();
+}
+
+function goBack() {
+  document.getElementById("view-detail").classList.remove("active");
+  document.getElementById("view-list").classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+function renderDetail() {
+  const c = currentCompany;
+  const from = document.getElementById("detail-from").value;
+  const to = document.getElementById("detail-to").value;
+  const fi = MONTHS.indexOf(from);
+  const ti = MONTHS.indexOf(to);
+  if (fi < 0 || ti < 0 || fi > ti) {
+    document.getElementById("range-label").textContent = "※ 시작월이 종료월보다 클 수 없습니다";
+    return;
+  }
+  const range = MONTHS.slice(fi, ti + 1);
+  document.getElementById("range-label").textContent = `(${range.length}개월)`;
+
+  let totalAmt = 0;
+  range.forEach(m => { totalAmt += calcForMonth(c, m).total; });
+  const totalDev = c.history.reduce((s,h) => s+(h.devAmt||0), 0);
+  const totalMonthly = c.history.reduce((s,h) => s+(h.monthly||0), 0) * range.length;
+
+  document.getElementById("detail-metrics").innerHTML = `
+    <div class="metric"><div class="metric-label">기간 합계 청구금액</div><div class="metric-value">${fw(totalAmt)}</div><div class="metric-sub">${range.length}개월 합산</div></div>
+    <div class="metric"><div class="metric-label">전산관리비 합계</div><div class="metric-value">${fw(c.jeonsan * range.length)}</div></div>
+    <div class="metric"><div class="metric-label">개발 월사용료 합계</div><div class="metric-value">${fw(totalMonthly)}</div></div>
+    <div class="metric"><div class="metric-label">총 개발금액</div><div class="metric-value">${fw(totalDev)}</div><div class="metric-sub">부가세 별도</div></div>
+  `;
+
+  // 1. 월별 유저 현황
+  let uh = `<thead><tr><th>월</th><th>본사</th><th>매장(결제X)</th><th>매장(결제O)</th><th>태블릿</th></tr></thead><tbody>`;
+  range.forEach(m => {
+    const u = c.monthlyUsers[m] || {bonsa:0,storeX:0,storeO:0,tablet:0};
+    uh += `<tr><td>${ml(m)}</td><td>${u.bonsa}</td><td>${u.storeX}</td><td>${u.storeO}</td><td>${u.tablet}</td></tr>`;
+  });
+  document.getElementById("user-table").innerHTML = uh + "</tbody>";
+
+  // 2. 월별 청구 합계
+  let bh = `<thead><tr><th>월</th><th>유저수 추가요금</th><th>전산관리비</th><th>개발 월사용료</th><th>월 합계</th></tr></thead><tbody>`;
+  let grandTotal = 0;
+  range.forEach(m => {
+    const p = calcForMonth(c, m);
+    grandTotal += p.total;
+    const userExtra = c.type === "월정액" ? (c.fixedAmt||0) : (p.bonsa+p.storeX+p.storeO+p.tablet);
+    bh += `<tr><td>${ml(m)}</td><td>${fw(userExtra)}</td><td>${fw(p.jeonsan)}</td><td>${fw(p.monthly)}</td><td style="font-weight:700;">${fw(p.total)}</td></tr>`;
+  });
+  bh += `<tr class="total-row"><td>합계 (${range.length}개월)</td><td colspan="3"></td><td>${fw(grandTotal)}</td></tr></tbody>`;
+  document.getElementById("billing-table").innerHTML = bh;
+
+  // 3. 개발 내역
+  let dh = `<thead><tr><th>날짜</th><th>개발내역</th><th>개발금(부가세별도)</th><th>월사용료</th><th>첨부파일</th><th>발행여부</th></tr></thead><tbody>`;
+  if (!c.history.length) {
+    dh += `<tr><td colspan="6" style="color:#9ca3af;">내역 없음</td></tr>`;
+  } else {
+    dh += c.history.map(h => `<tr>
+      <td>${h.date}</td><td>${h.desc}</td>
+      <td>${h.devAmt.toLocaleString()}원</td>
+      <td>${h.monthly.toLocaleString()}원</td>
+      <td style="color:#6b7280;font-size:12px;">${h.file||"-"}</td>
+      <td class="${h.issued==="O"?"so":"sx"}">${h.issued}</td>
+    </tr>`).join("");
+    dh += `<tr class="total-row"><td colspan="2">합계</td><td>${totalDev.toLocaleString()}원</td><td>${totalMonthly.toLocaleString()}원</td><td colspan="2"></td></tr>`;
+  }
+  document.getElementById("dev-table").innerHTML = dh + "</tbody>";
+}
+
+document.getElementById("sel-month").addEventListener("change", renderList);
+renderList();
+</script>
+</body>
+</html>
