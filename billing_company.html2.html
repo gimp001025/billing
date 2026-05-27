@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과금 관리 시스템</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --sidebar-w:200px; --sidebar-col:48px;
+  --primary:#4f46e5; --primary-dark:#3730a3; --primary-light:#e0e7ff;
+  --surface:#fff; --surface2:#f8fafc; --border:#e2e8f0;
+  --text:#1e293b; --muted:#64748b;
+  --green:#059669; --red:#dc2626; --yellow:#d97706;
+}
+body { font-family:'Noto Sans KR',sans-serif; background:#f1f5f9; color:var(--text); display:flex; min-height:100vh; font-size:12px; }
+
+/* SIDEBAR */
+#sidebar { width:var(--sidebar-w); min-height:100vh; background:#1e1b4b; display:flex; flex-direction:column; transition:width .25s; position:fixed; left:0; top:0; bottom:0; z-index:100; overflow:hidden; }
+#sidebar.col { width:var(--sidebar-col); }
+.sb-header { padding:16px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #312e81; min-height:56px; }
+.sb-logo { width:24px; height:24px; background:var(--primary); border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:12px; color:#fff; font-weight:700; }
+.sb-title { color:#fff; font-size:13px; font-weight:600; white-space:nowrap; opacity:1; transition:opacity .2s; }
+#sidebar.col .sb-title { opacity:0; }
+.sb-nav { flex:1; padding:8px 0; }
+.sb-group { color:#6366f1; font-size:9px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:12px 14px 4px; white-space:nowrap; opacity:1; transition:opacity .2s; }
+#sidebar.col .sb-group { opacity:0; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:9px 14px; color:#c7d2fe; cursor:pointer; border-radius:6px; margin:1px 6px; transition:background .15s,color .15s; white-space:nowrap; position:relative; }
+.nav-item:hover { background:#312e81; color:#fff; }
+.nav-item.active { background:var(--primary); color:#fff; }
+.nav-icon { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; }
+.nav-label { font-size:12px; font-weight:500; opacity:1; transition:opacity .2s; }
+#sidebar.col .nav-label { opacity:0; }
+.nav-tip { display:none; position:absolute; left:52px; background:#1e1b4b; color:#fff; padding:4px 10px; border-radius:4px; font-size:11px; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3); z-index:200; pointer-events:none; }
+#sidebar.col .nav-item:hover .nav-tip { display:block; }
+.sb-toggle { padding:12px; border-top:1px solid #312e81; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#a5b4fc; font-size:16px; transition:color .2s; }
+.sb-toggle:hover { color:#fff; }
+
+/* MAIN */
+#main { margin-left:var(--sidebar-w); flex:1; transition:margin-left .25s; display:flex; flex-direction:column; min-height:100vh; }
+#main.exp { margin-left:var(--sidebar-col); }
+.top-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 20px; height:48px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+.top-bar-title { font-size:14px; font-weight:600; }
+.top-bar-right { color:var(--muted); font-size:11px; }
+
+.page { display:none; flex:1; flex-direction:column; overflow:hidden; height:calc(100vh - 48px); }
+.page.active { display:flex; }
+
+/* BUTTONS */
+.btn { padding:5px 12px; border-radius:5px; border:none; font-size:11px; font-weight:500; cursor:pointer; font-family:inherit; transition:all .15s; display:inline-flex; align-items:center; gap:4px; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-outline { background:#fff; border:1px solid var(--border); color:var(--text); }
+.btn-outline:hover { border-color:var(--primary); color:var(--primary); }
+.btn-green { background:#ecfdf5; color:var(--green); border:1px solid #a7f3d0; }
+.btn-green:hover { background:var(--green); color:#fff; }
+.btn-red { background:#fef2f2; color:var(--red); border:1px solid #fecaca; }
+.btn-red:hover { background:var(--red); color:#fff; }
+
+/* ===== 업체+사용료 통합 레이아웃 ===== */
+.unified-layout { display:flex; flex:1; overflow:hidden; }
+
+/* 왼쪽 업체 패널 */
+.cp-panel { width:230px; min-width:210px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; }
+.cp-head { padding:10px; border-bottom:1px solid var(--border); background:var(--surface2); }
+.cp-head h3 { font-size:12px; font-weight:600; margin-bottom:6px; }
+.cp-search { border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:11px; width:100%; outline:none; font-family:inherit; margin-bottom:6px; }
+.cp-search:focus { border-color:var(--primary); }
+.cp-actions { display:flex; gap:4px; }
+.cp-list { flex:1; overflow-y:auto; }
+.cp-count { padding:5px 10px; font-size:10px; color:var(--muted); background:#f8fafc; border-bottom:1px solid var(--border); }
+.cp-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.cp-table th { font-size:10px; font-weight:600; color:var(--muted); padding:5px 8px; background:#f8fafc; border-bottom:1px solid var(--border); text-align:left; position:sticky; top:0; }
+.cp-table td { font-size:11px; padding:6px 8px; border-bottom:1px solid #f1f5f9; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cp-table tr:hover td { background:#f0f4ff; }
+.cp-table tr.selected td { background:var(--primary-light); color:var(--primary-dark); font-weight:600; }
+.badge { display:inline-block; padding:1px 5px; border-radius:8px; font-size:9px; font-weight:600; }
+.badge-ok { background:#dcfce7; color:#16a34a; }
+.badge-end { background:#fee2e2; color:var(--red); }
+
+/* 오른쪽 패널 */
+.right-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.right-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); gap:8px; }
+.right-empty .icon { font-size:40px; opacity:.2; }
+
+.right-content { display:none; flex-direction:column; flex:1; overflow:hidden; }
+.right-content.visible { display:flex; }
+
+/* 오른쪽 상단 툴바 */
+.right-toolbar { background:var(--surface); border-bottom:1px solid var(--border); padding:8px 16px; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.right-company-name { font-size:14px; font-weight:700; color:var(--text); flex:1; }
+
+/* 탭 (기본정보 / 사용료입력) */
+.right-tab-bar { display:flex; background:var(--surface); border-bottom:2px solid var(--border); padding:0 16px; flex-shrink:0; }
+.right-tab { padding:9px 18px; font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; border:none; background:none; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; }
+.right-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+
+/* 탭 패널 */
+.tab-panel { display:none; flex:1; overflow-y:auto; }
+.tab-panel.active { display:block; }
+
+/* ===== 기본정보 폼 ===== */
+.form-body { padding:14px 16px; }
+.form-section { background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:10px; overflow:hidden; }
+.form-section-title { padding:7px 12px; font-size:11px; font-weight:600; border-bottom:1px solid var(--border); }
+.fst-basic { background:#ede9fe; color:#5b21b6; border-color:#ddd6fe; }
+.fst-info { background:#e0f2fe; color:#075985; border-color:#bae6fd; }
+.fst-fee { background:#fef3c7; color:#92400e; border-color:#fde68a; }
+
+/* 사용료 요약 카드 */
+.fee-summary { margin-top:10px; }
+.fee-summary-title { font-size:11px; font-weight:600; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+.fee-summary-title span { font-size:10px; color:var(--muted); font-weight:400; }
+.fee-summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.fsc { background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; transition:box-shadow .15s; }
+.fsc:hover { box-shadow:0 2px 8px rgba(79,70,229,.1); }
+.fsc-label { font-size:10px; color:var(--muted); font-weight:500; }
+.fsc-value { font-size:14px; font-weight:700; color:var(--text); }
+.fsc-value.zero { color:#cbd5e1; font-weight:400; }
+.fsc-link { font-size:10px; color:var(--primary); cursor:pointer; margin-top:2px; }
+.fsc-link:hover { text-decoration:underline; }
+.fsc-total { background:var(--primary-light); border-color:#c7d2fe; }
+.fsc-total .fsc-label { color:var(--primary-dark); }
+.fsc-total .fsc-value { color:var(--primary); font-size:16px; }
+.form-section-body { padding:10px 12px; }
+.form-grid { display:grid; gap:8px 12px; }
+.fg-2 { grid-template-columns:repeat(2,1fr); }
+.fg-3 { grid-template-columns:repeat(3,1fr); }
+.fg-4 { grid-template-columns:repeat(4,1fr); }
+.form-field { display:flex; flex-direction:column; gap:3px; }
+.form-field.full { grid-column:1/-1; }
+.form-field label { font-size:10px; color:var(--muted); font-weight:500; }
+.f-input, .f-select, .f-textarea { border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:11px; font-family:inherit; color:var(--text); background:#fff; outline:none; transition:border-color .15s; }
+.f-input:focus, .f-select:focus, .f-textarea:focus { border-color:var(--primary); }
+.f-input[readonly], .f-input:disabled { background:#f8fafc; color:var(--muted); }
+.f-select:disabled { background:#f8fafc; color:var(--muted); }
+.f-textarea { resize:vertical; min-height:50px; }
+
+/* ===== 사용료 입력 폼 ===== */
+.fee-toolbar { background:var(--surface2); border-bottom:1px solid var(--border); padding:7px 16px; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.fee-tab-bar { display:flex; background:var(--surface2); border-bottom:1px solid var(--border); padding:0 16px; overflow-x:auto; flex-shrink:0; }
+.fee-tab { padding:7px 13px; font-size:11px; font-weight:500; color:var(--muted); cursor:pointer; border:none; background:none; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s; white-space:nowrap; }
+.fee-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:600; }
+.fee-body { padding:14px 16px; }
+
+.fee-section { background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:12px; overflow:hidden; }
+.fee-section-title { padding:7px 14px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); }
+.fst-erp { background:#ede9fe; color:#5b21b6; border-color:#ddd6fe; }
+.fst-sms { background:#e0f2fe; color:#075985; border-color:#bae6fd; }
+.fst-server { background:#f0fdf4; color:#166534; border-color:#bbf7d0; }
+.fst-smart { background:#fff7ed; color:#9a3412; border-color:#fed7aa; }
+.fst-gw { background:#fdf4ff; color:#7e22ce; border-color:#e9d5ff; }
+.fst-wms { background:#f0f9ff; color:#0c4a6e; border-color:#bae6fd; }
+.fst-partner { background:#fefce8; color:#854d0e; border-color:#fef08a; }
+.fee-section-body { padding:10px 12px; }
+.fee-grid { display:grid; gap:8px 12px; }
+.fee-field { display:flex; flex-direction:column; gap:3px; }
+.fee-label { font-size:10px; color:var(--muted); font-weight:500; }
+.fee-input { border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:11px; font-family:inherit; color:var(--text); background:#fff; outline:none; transition:border-color .15s; }
+.fee-input:focus { border-color:var(--primary); }
+.fee-input.calc { background:var(--primary-light); color:var(--primary-dark); font-weight:600; }
+.fee-input[readonly] { background:#f8fafc; color:var(--muted); }
+.fee-select { border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:11px; font-family:inherit; color:var(--text); background:#fff; outline:none; cursor:pointer; }
+.fee-divider { border:none; border-top:1px dashed var(--border); margin:8px 0; }
+.fee-sub-label { font-size:10px; font-weight:600; color:var(--text); margin-bottom:6px; }
+.total-row { background:var(--primary-light); border-radius:6px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+.total-row .t-label { font-size:11px; font-weight:600; color:var(--primary-dark); }
+.total-row .t-amount { font-size:14px; font-weight:700; color:var(--primary); }
+
+/* SRP 탭 스타일 */
+.srp-toolbar { background:var(--surface); border-bottom:1px solid var(--border); padding:8px 16px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.filter-group { display:flex; align-items:center; gap:4px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:4px 8px; }
+.filter-label { font-size:10px; color:var(--muted); white-space:nowrap; font-weight:500; }
+.filter-input, .filter-select { border:none; background:transparent; font-size:11px; color:var(--text); outline:none; font-family:inherit; }
+.radio-group { display:flex; gap:10px; align-items:center; }
+.radio-group label { display:flex; align-items:center; gap:3px; font-size:11px; cursor:pointer; }
+.srp-content { flex:1; overflow:auto; padding:12px 16px; }
+.table-wrap { background:var(--surface); border-radius:8px; border:1px solid var(--border); overflow:auto; }
+table.srp { width:100%; border-collapse:collapse; font-size:11px; min-width:1100px; }
+table.srp thead th { background:#f8fafc; border-bottom:2px solid var(--border); padding:7px 8px; text-align:center; font-weight:600; color:var(--text); white-space:nowrap; position:sticky; top:0; }
+table.srp thead tr:first-child th { border-bottom:1px solid var(--border); }
+table.srp tbody td { padding:6px 8px; border-bottom:1px solid #f1f5f9; text-align:center; white-space:nowrap; }
+table.srp tbody tr:hover { background:#f8faff; }
+.th-group { background:var(--primary-light) !important; color:var(--primary-dark) !important; font-size:10px; }
+.th-sub { font-size:10px; color:var(--muted); }
+.num { font-variant-numeric:tabular-nums; }
+.hilite { color:var(--primary); font-weight:700; }
+.zero { color:#cbd5e1; }
+.cn { text-align:left !important; font-weight:500; }
+
+/* 통계 */
+.stat-content { flex:1; overflow-y:auto; padding:14px 16px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.kpi-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+.kpi-label { font-size:10px; color:var(--muted); font-weight:500; margin-bottom:4px; }
+.kpi-value { font-size:18px; font-weight:700; color:var(--text); }
+.kpi-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.kpi-card.bl { border-left:3px solid var(--primary); }
+.kpi-card.gl { border-left:3px solid var(--green); }
+.kpi-card.yl { border-left:3px solid var(--yellow); }
+.kpi-card.rl { border-left:3px solid var(--red); }
+.stat-table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:auto; margin-bottom:14px; }
+.stat-table { width:100%; border-collapse:collapse; font-size:11px; min-width:800px; }
+.stat-table thead th { background:#f8fafc; border-bottom:2px solid var(--border); padding:7px 10px; text-align:center; font-weight:600; white-space:nowrap; position:sticky; top:0; }
+.stat-table tbody td { padding:6px 10px; border-bottom:1px solid #f1f5f9; text-align:right; white-space:nowrap; }
+.stat-table tbody td:first-child { text-align:left; font-weight:500; }
+.stat-table tbody tr:hover { background:#f8faff; }
+.stat-table tfoot td { padding:7px 10px; background:var(--primary-light); font-weight:700; color:var(--primary-dark); border-top:2px solid #c7d2fe; text-align:right; }
+.stat-table tfoot td:first-child { text-align:left; }
+.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.chart-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px; }
+.chart-title { font-size:12px; font-weight:600; margin-bottom:12px; }
+.bar-chart { display:flex; flex-direction:column; gap:6px; }
+.bar-row { display:flex; align-items:center; gap:8px; }
+.bar-name { font-size:10px; color:var(--muted); width:110px; text-align:right; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bar-track { flex:1; background:#f1f5f9; border-radius:4px; height:14px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; }
+.bar-val { font-size:10px; font-weight:600; width:60px; flex-shrink:0; }
+
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">과</div>
+    <span class="sb-title">과금 관리 시스템</span>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-group">메뉴</div>
+    <div class="nav-item" data-page="srp">
+      <div class="nav-icon"></div><span class="nav-label">SRP (업체과금관리)</span>
+      <div class="nav-tip">SRP (업체과금관리)</div>
+    </div>
+    <div class="nav-item active" data-page="company">
+      <div class="nav-icon"></div><span class="nav-label">업체등록 / 사용료</span>
+      <div class="nav-tip">업체등록 / 사용료</div>
+    </div>
+    <div class="nav-item" data-page="stat">
+      <div class="nav-icon"></div><span class="nav-label">사용료 통계</span>
+      <div class="nav-tip">사용료 통계</div>
+    </div>
+    <div class="sb-group" style="margin-top:8px">개발</div>
+    <div class="nav-item" data-page="quote">
+      <div class="nav-icon"></div><span class="nav-label">개발 견적서</span>
+      <div class="nav-tip">개발 견적서</div>
+    </div>
+    <div class="nav-item" data-page="order">
+      <div class="nav-icon"></div><span class="nav-label">발주서</span>
+      <div class="nav-tip">발주서</div>
+    </div>
+  </div>
+  <div class="sb-toggle" id="toggleBtn">⟨</div>
+</nav>
+
+<div id="main">
+  <div class="top-bar">
+    <span class="top-bar-title" id="topTitle">업체등록 / 사용료</span>
+    <div class="top-bar-right" id="todayStr"></div>
+  </div>
+
+  <!-- ===== SRP ===== -->
+  <div class="page" id="page-srp">
+    <div class="srp-toolbar">
+      <div class="filter-group"><span class="filter-label">기준년월</span><input type="month" class="filter-input" id="srpMonth" style="min-width:110px"></div>
+      <div class="filter-group"><span class="filter-label">발행일자</span><input type="date" class="filter-input" id="srpDate" style="min-width:110px"></div>
+      <div class="filter-group"><span class="filter-label">적요수정</span><select class="filter-select"><option>유</option><option>무</option></select></div>
+      <div class="filter-group"><span class="filter-label">메세지</span><select class="filter-select"><option>전체</option><option>사용</option><option>미사용</option></select></div>
+      <div class="filter-group"><span class="filter-label">스마트팩</span><select class="filter-select"><option>전체</option><option>사용</option><option>미사용</option></select></div>
+      <div class="radio-group">
+        <label><input type="radio" name="vt" value="all" checked> 전체</label>
+        <label><input type="radio" name="vt" value="detail"> 세부</label>
+      </div>
+      <button class="btn btn-primary" onclick="calcSRP()">🔄 계산</button>
+      <button class="btn btn-outline">📋 SMS계산</button>
+      <button class="btn btn-green">✅ 발행처리</button>
+      <button class="btn btn-outline">📊 엑셀</button>
+    </div>
+    <div class="srp-content">
+      <div class="table-wrap">
+        <table class="srp">
+          <thead>
+            <tr>
+              <th rowspan="2">No</th><th rowspan="2">업체명</th>
+              <th colspan="4" class="th-group">사용자수</th>
+              <th colspan="2" class="th-group">기본제공유저</th>
+              <th colspan="4" class="th-group">유저수비용(단가)</th>
+              <th colspan="2" class="th-group">추가유저수</th>
+              <th colspan="4" class="th-group">추가유저수비용</th>
+              <th rowspan="2" style="background:#fef3c7;color:#92400e;">합계</th>
+            </tr>
+            <tr>
+              <th class="th-sub">본사</th><th class="th-sub">매장(결제X)</th><th class="th-sub">매장(결제O)</th><th class="th-sub">태블릿</th>
+              <th class="th-sub">본사</th><th class="th-sub">매장</th>
+              <th class="th-sub">본사</th><th class="th-sub">매장(결제X)</th><th class="th-sub">매장(결제O)</th><th class="th-sub">태블릿</th>
+              <th class="th-sub">본사</th><th class="th-sub">매장(결제X)</th>
+              <th class="th-sub">본사</th><th class="th-sub">매장(결제X)</th><th class="th-sub">매장(결제O)</th><th class="th-sub">태블릿</th>
+            </tr>
+          </thead>
+          <tbody id="srpBody"><tr><td colspan="19" style="padding:30px;text-align:center;color:#94a3b8">기준년월 선택 후 <b>계산</b> 버튼을 클릭하세요</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 업체등록 + 사용료 통합 ===== -->
+  <div class="page active" id="page-company">
+    <div class="unified-layout">
+
+      <!-- 왼쪽: 업체 목록 -->
+      <div class="cp-panel">
+        <div class="cp-head">
+          <h3>업체 목록</h3>
+          <input class="cp-search" type="text" placeholder="업체명 검색..." oninput="filterCP(this.value)">
+          <div class="cp-actions">
+            <button class="btn btn-primary" style="flex:1" onclick="filterCP('')">🔍 검색</button>
+            <button class="btn btn-outline" onclick="resetCP()">초기화</button>
+            <button class="btn btn-green" onclick="openNew()">+ 신규</button>
+          </div>
+        </div>
+        <div class="cp-count" id="cpCount">0개</div>
+        <div class="cp-list">
+          <table class="cp-table" style="table-layout:fixed;width:100%">
+            <colgroup><col style="width:28px"><col><col style="width:42px"></colgroup>
+            <thead><tr><th>No</th><th>업체명</th><th>거래</th></tr></thead>
+            <tbody id="cpBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 오른쪽 패널 -->
+      <div class="right-panel">
+        <!-- 빈 상태 -->
+        <div class="right-empty" id="rightEmpty">
+          <div class="icon">🏢</div>
+          <p>업체를 선택하거나 신규 버튼을 클릭하세요</p>
+        </div>
+
+        <!-- 업체 선택 시 -->
+        <div class="right-content" id="rightContent">
+          <!-- 상단 툴바 -->
+          <div class="right-toolbar">
+            <span class="right-company-name" id="rcName">-</span>
+            <div id="rcButtons"></div>
+          </div>
+          <!-- 탭 바 -->
+          <div class="right-tab-bar">
+            <button class="right-tab active" onclick="switchRightTab('info',this)">기본정보</button>
+            <button class="right-tab" onclick="switchRightTab('fee',this)">사용료 입력</button>
+          </div>
+
+          <!-- 기본정보 탭 -->
+          <div class="tab-panel active" id="tab-info">
+            <div class="form-body" id="infoFormBody"></div>
+          </div>
+
+          <!-- 사용료 입력 탭 -->
+          <div class="tab-panel" id="tab-fee">
+            <!-- 고객사/협력업체 탭 -->
+            <div style="display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 16px;">
+              <button class="fee-tab active" onclick="switchFeeMain('customer',this)">고객사</button>
+              <button class="fee-tab" onclick="switchFeeMain('partner',this)">협력업체</button>
+            </div>
+            <div class="fee-toolbar">
+              <div class="filter-group"><span class="filter-label">기준년월</span><input type="month" id="feeMonth" style="min-width:100px"></div>
+              <button class="btn btn-primary" onclick="saveFee()">💾 저장</button>
+              <button class="btn btn-outline" onclick="resetFeeForm()">초기화</button>
+            </div>
+            <!-- 항목 탭 -->
+            <div id="feeTabBar"></div>
+            <div class="tab-panel active" id="tab-fee-body" style="display:block">
+              <div class="fee-body" id="feeFormBody"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 사용료 통계 ===== -->
+  <div class="page" id="page-stat">
+    <div style="display:flex;border-bottom:2px solid var(--border);background:var(--surface);padding:0 16px;">
+      <button class="right-tab active" onclick="switchStatTab('customer',this)" style="padding:10px 18px">고객사</button>
+      <button class="right-tab" onclick="switchStatTab('partner',this)" style="padding:10px 18px">협력업체</button>
+    </div>
+    <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:8px;align-items:center;">
+      <div class="filter-group"><span class="filter-label">기준년월</span><input type="month" id="statMonth" onchange="renderStat()"></div>
+      <button class="btn btn-primary" onclick="renderStat()">🔄 조회</button>
+      <button class="btn btn-outline">📊 엑셀</button>
+    </div>
+    <div class="stat-content" id="statContent"></div>
+  </div>
+
+  <!-- ===== 개발 견적서 ===== -->
+  <div class="page" id="page-quote">
+    <div class="unified-layout">
+      <!-- 왼쪽: 견적 목록 -->
+      <div class="cp-panel" style="width:260px">
+        <div class="cp-head">
+          <h3>견적서 목록</h3>
+          <input class="cp-search" type="text" placeholder="업체명 / 견적명 검색..." oninput="filterQuote(this.value,'existing')">
+          <div class="cp-actions" style="margin-top:6px">
+            <button class="btn btn-green" style="flex:1" onclick="openNewQuote('existing')">+ 기존업체 견적</button>
+            <button class="btn btn-outline" style="flex:1" onclick="openNewQuote('new')">+ 신규업체 견적</button>
+          </div>
+        </div>
+        <!-- 탭: 기존/신규 -->
+        <div style="display:flex;border-bottom:1px solid var(--border)">
+          <button class="fee-tab active" style="flex:1;padding:7px" onclick="switchQuoteListTab('existing',this)">기존 업체</button>
+          <button class="fee-tab" style="flex:1;padding:7px" onclick="switchQuoteListTab('new',this)">신규 업체</button>
+        </div>
+        <div class="cp-count" id="quoteCount">0건</div>
+        <div class="cp-list" id="quoteList"></div>
+      </div>
+
+      <!-- 오른쪽: 견적 상세 -->
+      <div class="right-panel">
+        <div class="right-empty" id="quoteEmpty">
+          <div class="icon">📄</div>
+          <p>견적서를 선택하거나 새로 작성하세요</p>
+        </div>
+        <div class="right-content" id="quoteContent">
+          <div class="right-toolbar">
+            <span class="right-company-name" id="quoteTitle">-</span>
+            <div id="quoteButtons"></div>
+          </div>
+          <div class="tab-panel active" style="display:block;overflow-y:auto">
+            <div class="form-body" id="quoteFormBody"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 발주서 ===== -->
+  <div class="page" id="page-order">
+    <div class="unified-layout">
+      <!-- 왼쪽: 발주 목록 -->
+      <div class="cp-panel" style="width:260px">
+        <div class="cp-head">
+          <h3>발주서 목록</h3>
+          <input class="cp-search" type="text" placeholder="업체명 / 발주명 검색..." oninput="filterOrder(this.value)">
+          <div class="cp-actions" style="margin-top:6px">
+            <button class="btn btn-green" style="flex:1" onclick="openNewOrder()">+ 신규 발주서</button>
+          </div>
+        </div>
+        <div class="cp-count" id="orderCount">0건</div>
+        <div class="cp-list" id="orderList"></div>
+      </div>
+
+      <!-- 오른쪽: 발주 상세 -->
+      <div class="right-panel">
+        <div class="right-empty" id="orderEmpty">
+          <div class="icon">📋</div>
+          <p>발주서를 선택하거나 새로 작성하세요</p>
+        </div>
+        <div class="right-content" id="orderContent">
+          <div class="right-toolbar">
+            <span class="right-company-name" id="orderTitle">-</span>
+            <div id="orderButtons"></div>
+          </div>
+          <div class="tab-panel active" style="display:block;overflow-y:auto">
+            <div class="form-body" id="orderFormBody"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 초기화 =====
+const today = new Date();
+const ym = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
+document.getElementById('todayStr').textContent = today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+document.getElementById('feeMonth').value = ym;
+document.getElementById('statMonth').value = ym;
+document.getElementById('srpMonth').value = ym;
+document.getElementById('srpDate').value = today.toISOString().split('T')[0];
+
+// ===== 사이드바 =====
+let collapsed = false;
+document.getElementById('toggleBtn').addEventListener('click', () => {
+  collapsed = !collapsed;
+  document.getElementById('sidebar').classList.toggle('col', collapsed);
+  document.getElementById('main').classList.toggle('exp', collapsed);
+  document.getElementById('toggleBtn').textContent = collapsed ? '⟩' : '⟨';
+});
+
+// ===== 메뉴 =====
+const pageTitles = { srp:'SRP · 업체과금관리', company:'업체등록 / 사용료 입력', stat:'사용료 통계', quote:'개발 견적서', order:'발주서' };
+document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+item.dataset.page).classList.add('active');
+    document.getElementById('topTitle').textContent = pageTitles[item.dataset.page];
+    if (item.dataset.page === 'stat') renderStat();
+  });
+});
+
+// ===== 데이터 =====
+let companies = [
+  {id:1,name:'리아드',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:2,name:'마티레',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:3,name:'툴앤코',trading:'정상',calcType:'월정액',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:0,addStoreFee:0},
+  {id:4,name:'제이제이인터내셔날',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:5,name:'가온패션',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:6,name:'하크어패럴',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:7,name:'이안리테일',trading:'정상',calcType:'월정액',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:0,addStoreFee:0},
+  {id:8,name:'글로니',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:9,name:'에스제이그룹(랑골/LCDC)',trading:'정상',calcType:'유저수체크',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:10000,addStoreFee:8000},
+  {id:10,name:'잔피엘',trading:'정상',calcType:'월정액',grade:'ASP업체',bizNo:'',tel:'',manager:'',brand:'',salesMgr:'',csMgr:'',address:'',initFee:0,hqUser:5,storeUser:5,addHQFee:0,addStoreFee:0},
+];
+let nextId = 11;
+let selectedId = null;
+let isNew = false;
+let isEdit = false;
+const feeStore = {};
+
+// ===== 업체 목록 =====
+function renderCPList(filter='') {
+  const tbody = document.getElementById('cpBody');
+  const list = companies.filter(c => c.name.includes(filter));
+  tbody.innerHTML = '';
+  list.forEach((c,i) => {
+    const tr = document.createElement('tr');
+    if (selectedId === c.id) tr.classList.add('selected');
+    tr.innerHTML = `<td style="text-align:center">${i+1}</td><td>${c.name}</td><td><span class="badge ${c.trading==='정상'?'badge-ok':'badge-end'}">${c.trading}</span></td>`;
+    tr.onclick = () => selectCompany(c.id);
+    tbody.appendChild(tr);
+  });
+  document.getElementById('cpCount').textContent = list.length+'개';
+}
+function filterCP(val) { renderCPList(val); }
+function resetCP() { document.querySelector('.cp-search').value=''; renderCPList(); }
+
+function selectCompany(id) {
+  selectedId = id; isNew = false; isEdit = false;
+  renderCPList(document.querySelector('.cp-search').value);
+  showRight('view');
+}
+
+function openNew() {
+  selectedId = null; isNew = true; isEdit = false;
+  renderCPList(document.querySelector('.cp-search').value);
+  showRight('new');
+}
+
+// ===== 오른쪽 패널 =====
+function showRight(mode) {
+  document.getElementById('rightEmpty').style.display = 'none';
+  document.getElementById('rightContent').classList.add('visible');
+  const c = companies.find(x => x.id === selectedId);
+  document.getElementById('rcName').textContent = mode === 'new' ? '신규 업체 등록' : c.name;
+
+  const btns = document.getElementById('rcButtons');
+  if (mode === 'view') {
+    btns.innerHTML = `<div style="display:flex;gap:6px">
+      <button class="btn btn-primary" onclick="setEdit()">✏️ 수정</button>
+      <button class="btn btn-green" onclick="openNew()">➕ 신규</button>
+      <button class="btn btn-red" onclick="deleteCompany()">🗑️ 삭제</button>
+    </div>`;
+    renderInfoForm(c, true);
+  } else if (mode === 'edit') {
+    btns.innerHTML = `<div style="display:flex;gap:6px">
+      <button class="btn btn-primary" onclick="saveEdit()">💾 저장</button>
+      <button class="btn btn-outline" onclick="selectCompany(${selectedId})">취소</button>
+    </div>`;
+    renderInfoForm(c, false);
+  } else {
+    btns.innerHTML = `<div style="display:flex;gap:6px">
+      <button class="btn btn-primary" onclick="saveNew()">💾 저장</button>
+      <button class="btn btn-outline" onclick="cancelNew()">취소</button>
+    </div>`;
+    renderInfoForm(null, false);
+  }
+  // 사용료 탭 초기화
+  currentFeeMain = 'customer';
+  currentFeeTab = 'erp';
+  renderFeeTabBar();
+  renderFeeForm();
+}
+
+// ===== 기본정보 폼 =====
+function fv(c, field, def='') { return c ? (c[field] ?? def) : def; }
+function renderInfoForm(c, ro) {
+  const r = ro ? 'readonly' : '';
+  const d = ro ? 'disabled' : '';
+  document.getElementById('infoFormBody').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title fst-basic">📋 기본 정보</div>
+      <div class="form-section-body">
+        <div class="form-grid fg-3">
+          <div class="form-field"><label>사업자번호</label><input class="f-input" id="fi_bizNo" value="${fv(c,'bizNo')}" ${r} placeholder="000-00-00000"></div>
+          <div class="form-field"><label>업체명 *</label><input class="f-input" id="fi_name" value="${fv(c,'name')}" ${r} placeholder="업체명"></div>
+          <div class="form-field"><label>거래여부</label><select class="f-select" id="fi_trading" ${d}><option ${fv(c,'trading')==='정상'?'selected':''}>정상</option><option ${fv(c,'trading')==='종료'?'selected':''}>종료</option></select></div>
+          <div class="form-field"><label>업체구분</label><select class="f-select" id="fi_grade" ${d}><option ${fv(c,'grade')==='ASP업체'?'selected':''}>ASP업체</option><option ${fv(c,'grade')==='설치형'?'selected':''}>설치형</option></select></div>
+          <div class="form-field"><label>산정구분</label><select class="f-select" id="fi_calcType" ${d}><option ${fv(c,'calcType')==='유저수체크'?'selected':''}>유저수체크</option><option ${fv(c,'calcType')==='월정액'?'selected':''}>월정액</option></select></div>
+          <div class="form-field"><label>계약업체</label><select class="f-select" id="fi_contractor" ${d}><option>세원아토스</option><option>세원EDS</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title fst-info">🏪 업체 정보</div>
+      <div class="form-section-body">
+        <div class="form-grid fg-3">
+          <div class="form-field"><label>전화번호</label><input class="f-input" id="fi_tel" value="${fv(c,'tel')}" ${r} placeholder="02-0000-0000"></div>
+          <div class="form-field"><label>담당자</label><input class="f-input" id="fi_manager" value="${fv(c,'manager')}" ${r}></div>
+          <div class="form-field"><label>브랜드</label><input class="f-input" id="fi_brand" value="${fv(c,'brand')}" ${r}></div>
+          <div class="form-field"><label>영업담당자</label><input class="f-input" id="fi_salesMgr" value="${fv(c,'salesMgr')}" ${r}></div>
+          <div class="form-field"><label>CS담당자</label><input class="f-input" id="fi_csMgr" value="${fv(c,'csMgr')}" ${r}></div>
+          <div class="form-field full"><label>주소</label><input class="f-input" id="fi_address" value="${fv(c,'address')}" ${r}></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title fst-fee">💰 과금 설정</div>
+      <div class="form-section-body">
+        <div class="form-grid fg-4">
+          <div class="form-field"><label>초기 월사용료 (원)</label><input class="f-input" id="fi_initFee" type="number" value="${fv(c,'initFee',0)}" ${r}></div>
+          <div class="form-field"><label>기본 본사유저 (명)</label><input class="f-input" id="fi_hqUser" type="number" value="${fv(c,'hqUser',5)}" ${r}></div>
+          <div class="form-field"><label>기본 매장유저 (명)</label><input class="f-input" id="fi_storeUser" type="number" value="${fv(c,'storeUser',5)}" ${r}></div>
+          <div class="form-field"></div>
+          <div class="form-field"><label>본사 추가단가 (원/명)</label><input class="f-input" id="fi_addHQFee" type="number" value="${fv(c,'addHQFee',0)}" ${r}></div>
+          <div class="form-field"><label>매장 추가단가 (원/명)</label><input class="f-input" id="fi_addStoreFee" type="number" value="${fv(c,'addStoreFee',0)}" ${r}></div>
+        </div>
+      </div>
+    </div>
+    ${c ? renderFeeSummaryHTML(c.id) : ''}`;
+}
+
+function renderFeeSummaryHTML(companyId) {
+  const key = companyId + '_' + ym;
+  const d = feeStore[key] || {};
+  const erp   = (+d.erp_base||0) + (+d.erp_hq_rate||0)*(+d.erp_hq_add||0) + (+d.erp_st_rate||0)*(+d.erp_st_add||0);
+  const sms   = ['sms','lms','mms','alim','brand'].reduce((s,t)=>(s+(+d[t+'_rate']||0)*(+d[t+'_cnt']||0)),0);
+  const server= +d.server_fee||0;
+  const smart = (+d.sm_logi_user||0)*(+d.sm_logi_rate||20000) + (+d.sm_store_user||0)*(+d.sm_store_rate||10000);
+  const gw    = (+d.gw_user||0)*(+d.gw_user_rate||0) + (+d.gw_sms_cnt||0)*(+d.gw_sms_rate||0) + (+d.gw_fax_cnt||0)*(+d.gw_fax_rate||0);
+  const ver=d.wms_ver, limit=ver==='starter'?10000:ver==='standard'?20000:0;
+  const over=ver?Math.max(0,(+d.wms_cnt||0)-limit):0;
+  const wms   = (+d.wms_sewon||0)+(+d.wms_base||0)+(over*20);
+  const total = erp+sms+server+smart+gw+wms;
+  const fmt = n => n ? n.toLocaleString()+'원' : '-';
+  const items = [
+    {label:'ERP',value:erp,tab:'erp'},
+    {label:'문자사용료',value:sms,tab:'sms'},
+    {label:'서버이용',value:server,tab:'server'},
+    {label:'스마트팩',value:smart,tab:'smart'},
+    {label:'그룹웨어',value:gw,tab:'gw'},
+    {label:'WMS',value:wms,tab:'wms'},
+  ];
+  return `
+    <div class="form-section" style="margin-top:0">
+      <div class="fee-section-title fst-partner" style="padding:7px 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border)">
+        📊 이번달 사용료 요약
+        <span style="font-size:10px;font-weight:400;color:var(--muted)">${ym} 기준 · 저장된 데이터 기준</span>
+      </div>
+      <div class="form-section-body">
+        <div class="fee-summary-grid">
+          ${items.map(it=>`
+            <div class="fsc" onclick="goToFeeTab('${it.tab}')" style="cursor:pointer">
+              <span class="fsc-label">${it.label}</span>
+              <span class="fsc-value ${it.value===0?'zero':''}">${fmt(it.value)}</span>
+              <span class="fsc-link">입력하기 →</span>
+            </div>`).join('')}
+          <div class="fsc fsc-total">
+            <span class="fsc-label">이번달 총 합계</span>
+            <span class="fsc-value">${total?total.toLocaleString()+'원':'미입력'}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function goToFeeTab(tab) {
+  // 사용료 입력 탭으로 이동 후 해당 항목 탭 활성화
+  const feeTabBtn = document.querySelector('.right-tab:last-child');
+  switchRightTab('fee', feeTabBtn);
+  currentFeeMain = 'customer';
+  currentFeeTab = tab;
+  renderFeeTabBar();
+  renderFeeForm();
+}
+
+function setEdit() { isEdit = true; showRight('edit'); }
+function cancelNew() {
+  selectedId = null; isNew = false;
+  document.getElementById('rightEmpty').style.display = '';
+  document.getElementById('rightContent').classList.remove('visible');
+  renderCPList(document.querySelector('.cp-search').value);
+}
+function saveEdit() {
+  const idx = companies.findIndex(x => x.id === selectedId);
+  if (idx < 0) return;
+  companies[idx] = { ...companies[idx], ...readInfoForm() };
+  renderCPList(document.querySelector('.cp-search').value);
+  selectCompany(selectedId);
+  alert('저장되었습니다.');
+}
+function saveNew() {
+  const data = readInfoForm();
+  if (!data.name.trim()) { alert('업체명을 입력하세요.'); return; }
+  const newC = { id: nextId++, ...data, hqUser:5, storeUser:5, addHQFee:0, addStoreFee:0 };
+  companies.push(newC);
+  selectedId = newC.id; isNew = false;
+  renderCPList(document.querySelector('.cp-search').value);
+  selectCompany(newC.id);
+  alert('등록되었습니다.');
+}
+function deleteCompany() {
+  const c = companies.find(x => x.id === selectedId);
+  if (!c || !confirm(`"${c.name}" 업체를 삭제하시겠습니까?`)) return;
+  companies = companies.filter(x => x.id !== selectedId);
+  selectedId = null;
+  document.getElementById('rightEmpty').style.display = '';
+  document.getElementById('rightContent').classList.remove('visible');
+  renderCPList(document.querySelector('.cp-search').value);
+}
+function readInfoForm() {
+  return {
+    name: val('fi_name'), bizNo: val('fi_bizNo'), trading: val('fi_trading'),
+    grade: val('fi_grade'), calcType: val('fi_calcType'),
+    tel: val('fi_tel'), manager: val('fi_manager'), brand: val('fi_brand'),
+    salesMgr: val('fi_salesMgr'), csMgr: val('fi_csMgr'), address: val('fi_address'),
+    initFee: +val('fi_initFee')||0,
+  };
+}
+
+// ===== 오른쪽 탭 전환 =====
+function switchRightTab(tab, btn) {
+  document.querySelectorAll('.right-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel[id^="tab-"]').forEach(p => { if(p.id==='tab-info'||p.id==='tab-fee') p.classList.remove('active'); });
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ===== 사용료 탭 =====
+let currentFeeMain = 'customer';
+let currentFeeTab = 'erp';
+const customerFeeTabs = [{id:'erp',label:'ERP'},{id:'sms',label:'문자사용료'},{id:'server',label:'서버이용'},{id:'smart',label:'스마트팩'},{id:'gw',label:'그룹웨어'},{id:'wms',label:'WMS'}];
+const partnerFeeTabs  = [{id:'van',label:'벤 수수료'},{id:'taxfree',label:'텍스프리'},{id:'pwms',label:'WMS'}];
+
+function switchFeeMain(tab, btn) {
+  currentFeeMain = tab;
+  btn.closest('div').querySelectorAll('.fee-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFeeTab = tab === 'customer' ? 'erp' : 'van';
+  renderFeeTabBar();
+  renderFeeForm();
+}
+function renderFeeTabBar() {
+  const tabs = currentFeeMain === 'customer' ? customerFeeTabs : partnerFeeTabs;
+  document.getElementById('feeTabBar').innerHTML = `<div class="fee-tab-bar">${tabs.map(t=>`<button class="fee-tab ${t.id===currentFeeTab?'active':''}" onclick="switchFeeTab('${t.id}',this)">${t.label}</button>`).join('')}</div>`;
+}
+function switchFeeTab(tab, btn) {
+  currentFeeTab = tab;
+  btn.closest('.fee-tab-bar').querySelectorAll('.fee-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeeForm();
+}
+
+// ===== 사용료 폼 =====
+function feeKey() { return (selectedId||'new')+'_'+document.getElementById('feeMonth').value; }
+function feeData() { return feeStore[feeKey()] || {}; }
+function fv2(f, def='') { return feeData()[f] ?? def; }
+
+function renderFeeForm() {
+  const tpls = { erp:tplERP, sms:tplSMS, server:tplServer, smart:tplSmart, gw:tplGW, wms:tplWMS, van:()=>tplCard('van','벤 수수료'), taxfree:()=>tplCard('taxfree','텍스프리 수수료'), pwms:tplPWMS };
+  document.getElementById('feeFormBody').innerHTML = (tpls[currentFeeTab]||(() => ''))();
+  document.getElementById('feeFormBody').querySelectorAll('[data-calc]').forEach(el => el.addEventListener('input', autoCalc));
+  autoCalc();
+}
+
+function autoCalc() { calcERP(); calcSMS(); calcSmart(); calcGW(); calcWMS(); calcCard('van'); calcCard('taxfree'); }
+
+function tplERP() { return `
+  <div class="fee-section"><div class="fee-section-title fst-erp">⚙️ ERP 전산관리비</div><div class="fee-section-body">
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">전산관리비 (월정액, 원)</span><input class="fee-input" id="erp_base" type="number" placeholder="0" value="${fv2('erp_base')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">본사 추가단가 (원/명)</span><input class="fee-input" id="erp_hq_rate" type="number" placeholder="0" value="${fv2('erp_hq_rate')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">매장 추가단가 (원/명)</span><input class="fee-input" id="erp_st_rate" type="number" placeholder="0" value="${fv2('erp_st_rate')}" data-calc></div>
+    </div>
+    <hr class="fee-divider">
+    <div class="fee-sub-label">추가 유저수 (기본 초과분)</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">본사 추가유저 (명)</span><input class="fee-input" id="erp_hq_add" type="number" placeholder="0" value="${fv2('erp_hq_add')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">매장 추가유저 (명)</span><input class="fee-input" id="erp_st_add" type="number" placeholder="0" value="${fv2('erp_st_add')}" data-calc></div>
+    </div>
+    <div class="total-row"><span class="t-label">ERP 합계</span><span class="t-amount" id="erp_total">0 원</span></div>
+  </div></div>`; }
+function calcERP() {
+  const t = (+g('erp_base')||0) + (+g('erp_hq_rate')||0)*(+g('erp_hq_add')||0) + (+g('erp_st_rate')||0)*(+g('erp_st_add')||0);
+  st('erp_total', t.toLocaleString()+' 원');
+}
+
+function tplSMS() {
+  const types = [{id:'sms',label:'SMS',rate:11},{id:'lms',label:'LMS',rate:33},{id:'mms',label:'MMS',rate:55},{id:'alim',label:'알림톡',rate:8},{id:'brand',label:'브랜드메세지',rate:30}];
+  return `<div class="fee-section"><div class="fee-section-title fst-sms">💬 문자사용료</div><div class="fee-section-body">
+    <div class="fee-grid fg-3">${types.map(t=>`
+      <div class="fee-field"><span class="fee-label">${t.label} 단가 (원/건)</span><input class="fee-input" id="${t.id}_rate" type="number" value="${fv2(t.id+'_rate',t.rate)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">${t.label} 건수</span><input class="fee-input" id="${t.id}_cnt" type="number" placeholder="0" value="${fv2(t.id+'_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">${t.label} 금액</span><input class="fee-input calc" id="${t.id}_amt" type="text" readonly></div>
+    `).join('<hr class="fee-divider" style="grid-column:1/-1">')}</div>
+    <div class="total-row"><span class="t-label">문자 합계</span><span class="t-amount" id="sms_total">0 원</span></div>
+  </div></div>`;
+}
+function calcSMS() {
+  let tot = 0;
+  ['sms','lms','mms','alim','brand'].forEach(t => { const a=(+g(t+'_rate')||0)*(+g(t+'_cnt')||0); st(t+'_amt',a.toLocaleString()); tot+=a; });
+  st('sms_total', tot.toLocaleString()+' 원');
+}
+
+function tplServer() { return `
+  <div class="fee-section"><div class="fee-section-title fst-server">🖥️ 서버이용료</div><div class="fee-section-body">
+    <div class="fee-grid fg-2">
+      <div class="fee-field"><span class="fee-label">서버이용료 (월정액, 원)</span><input class="fee-input" id="server_fee" type="number" placeholder="0" value="${fv2('server_fee')}" oninput="st('server_total',(+this.value||0).toLocaleString()+' 원')"></div>
+      <div class="fee-field"><span class="fee-label">비고</span><input class="fee-input" id="server_note" type="text" placeholder="메모" value="${fv2('server_note')}"></div>
+    </div>
+    <div class="total-row"><span class="t-label">서버이용료 합계</span><span class="t-amount" id="server_total">${(+fv2('server_fee')||0).toLocaleString()} 원</span></div>
+  </div></div>`; }
+
+function tplSmart() { return `
+  <div class="fee-section"><div class="fee-section-title fst-smart">📦 스마트팩</div><div class="fee-section-body">
+    <div class="fee-sub-label">SM물류 (1유저당 20,000원)</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">당월 접속 유저수 (명)</span><input class="fee-input" id="sm_logi_user" type="number" placeholder="0" value="${fv2('sm_logi_user')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">단가 (원/명)</span><input class="fee-input" id="sm_logi_rate" type="number" value="${fv2('sm_logi_rate',20000)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">SM물류 금액</span><input class="fee-input calc" id="sm_logi_amt" type="text" readonly></div>
+    </div>
+    <hr class="fee-divider">
+    <div class="fee-sub-label">SM매장 (1유저당 10,000원)</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">당월 접속 유저수 (명)</span><input class="fee-input" id="sm_store_user" type="number" placeholder="0" value="${fv2('sm_store_user')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">단가 (원/명)</span><input class="fee-input" id="sm_store_rate" type="number" value="${fv2('sm_store_rate',10000)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">SM매장 금액</span><input class="fee-input calc" id="sm_store_amt" type="text" readonly></div>
+    </div>
+    <div class="total-row"><span class="t-label">스마트팩 합계</span><span class="t-amount" id="smart_total">0 원</span></div>
+  </div></div>`; }
+function calcSmart() {
+  const la=(+g('sm_logi_user')||0)*(+g('sm_logi_rate')||20000);
+  const sa=(+g('sm_store_user')||0)*(+g('sm_store_rate')||10000);
+  st('sm_logi_amt',la.toLocaleString()+' 원'); st('sm_store_amt',sa.toLocaleString()+' 원');
+  st('smart_total',(la+sa).toLocaleString()+' 원');
+}
+
+function tplGW() { return `
+  <div class="fee-section"><div class="fee-section-title fst-gw">🗂️ 그룹웨어</div><div class="fee-section-body">
+    <div class="fee-sub-label">유저 사용료</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">당월 유저수 (명)</span><input class="fee-input" id="gw_user" type="number" placeholder="0" value="${fv2('gw_user')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">유저 단가 (원/명)</span><input class="fee-input" id="gw_user_rate" type="number" placeholder="0" value="${fv2('gw_user_rate')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">유저 사용료</span><input class="fee-input calc" id="gw_user_amt" type="text" readonly></div>
+    </div>
+    <hr class="fee-divider">
+    <div class="fee-sub-label">문자 사용료</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">문자 건수</span><input class="fee-input" id="gw_sms_cnt" type="number" placeholder="0" value="${fv2('gw_sms_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">문자 단가 (원/건)</span><input class="fee-input" id="gw_sms_rate" type="number" placeholder="0" value="${fv2('gw_sms_rate')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">문자 금액</span><input class="fee-input calc" id="gw_sms_amt" type="text" readonly></div>
+    </div>
+    <hr class="fee-divider">
+    <div class="fee-sub-label">팩스 사용료</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">팩스 건수</span><input class="fee-input" id="gw_fax_cnt" type="number" placeholder="0" value="${fv2('gw_fax_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">팩스 단가 (원/건)</span><input class="fee-input" id="gw_fax_rate" type="number" placeholder="0" value="${fv2('gw_fax_rate')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">팩스 금액</span><input class="fee-input calc" id="gw_fax_amt" type="text" readonly></div>
+    </div>
+    <div class="total-row"><span class="t-label">그룹웨어 합계</span><span class="t-amount" id="gw_total">0 원</span></div>
+  </div></div>`; }
+function calcGW() {
+  const ua=(+g('gw_user')||0)*(+g('gw_user_rate')||0);
+  const sa=(+g('gw_sms_cnt')||0)*(+g('gw_sms_rate')||0);
+  const fa=(+g('gw_fax_cnt')||0)*(+g('gw_fax_rate')||0);
+  st('gw_user_amt',ua.toLocaleString()+' 원'); st('gw_sms_amt',sa.toLocaleString()+' 원'); st('gw_fax_amt',fa.toLocaleString()+' 원');
+  st('gw_total',(ua+sa+fa).toLocaleString()+' 원');
+}
+
+function tplWMS() { return `
+  <div class="fee-section"><div class="fee-section-title fst-wms">🚚 WMS</div><div class="fee-section-body">
+    <div class="fee-sub-label">세원 WMS</div>
+    <div class="fee-grid fg-2">
+      <div class="fee-field"><span class="fee-label">세원WMS 사용료 (월정액, 원)</span><input class="fee-input" id="wms_sewon" type="number" placeholder="0" value="${fv2('wms_sewon')}" data-calc></div>
+    </div>
+    <hr class="fee-divider">
+    <div class="fee-sub-label">로지웍스</div>
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">버전</span>
+        <select class="fee-select" id="wms_ver" data-calc onchange="autoCalc()">
+          <option value="">미사용</option>
+          <option value="starter" ${fv2('wms_ver')==='starter'?'selected':''}>스타터 (1만건 기준)</option>
+          <option value="standard" ${fv2('wms_ver')==='standard'?'selected':''}>스탠다드 (2만건 기준)</option>
+        </select>
+      </div>
+      <div class="fee-field"><span class="fee-label">월 기본 사용료 (원)</span><input class="fee-input" id="wms_base" type="number" placeholder="0" value="${fv2('wms_base')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">당월 운송장 건수</span><input class="fee-input" id="wms_cnt" type="number" placeholder="0" value="${fv2('wms_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">초과 건수 (자동)</span><input class="fee-input calc" id="wms_over" type="text" readonly></div>
+      <div class="fee-field"><span class="fee-label">초과 요금 (건당 20원)</span><input class="fee-input calc" id="wms_over_fee" type="text" readonly></div>
+    </div>
+    <div class="total-row"><span class="t-label">WMS 합계</span><span class="t-amount" id="wms_total">0 원</span></div>
+  </div></div>`; }
+function calcWMS() {
+  const ver=g('wms_ver'), limit=ver==='starter'?10000:ver==='standard'?20000:0;
+  const cnt=+g('wms_cnt')||0, over=ver?Math.max(0,cnt-limit):0, overFee=over*20;
+  st('wms_over',over.toLocaleString()+' 건'); st('wms_over_fee',overFee.toLocaleString()+' 원');
+  st('wms_total',((+g('wms_sewon')||0)+(+g('wms_base')||0)+overFee).toLocaleString()+' 원');
+}
+
+function tplCard(id, title) { return `
+  <div class="fee-section"><div class="fee-section-title fst-partner">💳 ${title}</div><div class="fee-section-body">
+    <div class="fee-grid fg-3">
+      <div class="fee-field"><span class="fee-label">신용카드 건수</span><input class="fee-input" id="${id}_cr_cnt" type="number" placeholder="0" value="${fv2(id+'_cr_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">단가 (원/건)</span><input class="fee-input" id="${id}_cr_rate" type="number" value="${fv2(id+'_cr_rate',60)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">신용카드 금액</span><input class="fee-input calc" id="${id}_cr_amt" type="text" readonly></div>
+      <div class="fee-field"><span class="fee-label">체크카드 건수</span><input class="fee-input" id="${id}_ck_cnt" type="number" placeholder="0" value="${fv2(id+'_ck_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">단가 (원/건)</span><input class="fee-input" id="${id}_ck_rate" type="number" value="${fv2(id+'_ck_rate',50)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">체크카드 금액</span><input class="fee-input calc" id="${id}_ck_amt" type="text" readonly></div>
+      <div class="fee-field"><span class="fee-label">해외카드 건수</span><input class="fee-input" id="${id}_fo_cnt" type="number" placeholder="0" value="${fv2(id+'_fo_cnt')}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">단가 (원/건)</span><input class="fee-input" id="${id}_fo_rate" type="number" value="${fv2(id+'_fo_rate',20)}" data-calc></div>
+      <div class="fee-field"><span class="fee-label">해외카드 금액</span><input class="fee-input calc" id="${id}_fo_amt" type="text" readonly></div>
+    </div>
+    <div class="total-row"><span class="t-label">${title} 합계</span><span class="t-amount" id="${id}_total">0 원</span></div>
+  </div></div>`; }
+function calcCard(id) {
+  const t=['cr','ck','fo'].reduce((s,k)=>{ const a=(+g(id+'_'+k+'_cnt')||0)*(+g(id+'_'+k+'_rate')||0); st(id+'_'+k+'_amt',a.toLocaleString()); return s+a; },0);
+  st(id+'_total',t.toLocaleString()+' 원');
+}
+
+function tplPWMS() { return `
+  <div class="fee-section"><div class="fee-section-title fst-partner">🚚 WMS 사용료</div><div class="fee-section-body">
+    <div class="fee-grid fg-2">
+      <div class="fee-field"><span class="fee-label">WMS 사용료 (월정액, 원)</span><input class="fee-input" id="pwms_fee" type="number" placeholder="0" value="${fv2('pwms_fee')}" oninput="st('pwms_total',(+this.value||0).toLocaleString()+' 원')"></div>
+      <div class="fee-field"><span class="fee-label">비고</span><input class="fee-input" id="pwms_note" type="text" placeholder="메모" value="${fv2('pwms_note')}"></div>
+    </div>
+    <div class="total-row"><span class="t-label">WMS 합계</span><span class="t-amount" id="pwms_total">${(+fv2('pwms_fee')||0).toLocaleString()} 원</span></div>
+  </div></div>`; }
+
+function saveFee() {
+  const key = feeKey();
+  if (!feeStore[key]) feeStore[key] = {};
+  document.getElementById('feeFormBody').querySelectorAll('input,select').forEach(el => { if (el.id) feeStore[key][el.id] = el.value; });
+  alert('저장되었습니다.');
+}
+function resetFeeForm() {
+  document.getElementById('feeFormBody').querySelectorAll('input').forEach(el => { if (!el.readOnly) el.value = ''; });
+  autoCalc();
+}
+
+// ===== SRP =====
+const srpData = [
+  {name:'리아드',hqUser:5,storeX:3,storeO:2,tablet:1,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'마티레',hqUser:8,storeX:6,storeO:4,tablet:2,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'툴앤코',hqUser:3,storeX:2,storeO:5,tablet:3,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'제이제이인터내셔날',hqUser:10,storeX:8,storeO:6,tablet:2,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'가온패션',hqUser:4,storeX:4,storeO:3,tablet:0,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'하크어패럴',hqUser:6,storeX:5,storeO:7,tablet:1,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'이안리테일',hqUser:5,storeX:3,storeO:2,tablet:2,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'글로니',hqUser:7,storeX:6,storeO:4,tablet:3,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'에스제이그룹(랑골/LCDC)',hqUser:12,storeX:10,storeO:8,tablet:4,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+  {name:'잔피엘',hqUser:2,storeX:2,storeO:1,tablet:0,hqBase:5,storeBase:5,hqRate:10000,storeXRate:8000,storeORate:12000,tabRate:5000},
+];
+function calcSRP() {
+  const tbody = document.getElementById('srpBody');
+  tbody.innerHTML = '';
+  srpData.forEach((d,i) => {
+    const ah=Math.max(0,d.hqUser-d.hqBase), ax=Math.max(0,d.storeX-d.storeBase);
+    const ch=ah*d.hqRate, cx=ax*d.storeXRate, co=d.storeO*d.storeORate, ct=d.tablet*d.tabRate;
+    const tot=ch+cx+co+ct;
+    const f=n=>n===0?'<span class="zero">0</span>':n.toLocaleString();
+    tbody.innerHTML+=`<tr>
+      <td>${i+1}</td><td class="cn">${d.name}</td>
+      <td class="num">${f(d.hqUser)}</td><td class="num">${f(d.storeX)}</td><td class="num">${f(d.storeO)}</td><td class="num">${f(d.tablet)}</td>
+      <td class="num">${f(d.hqBase)}</td><td class="num">${f(d.storeBase)}</td>
+      <td class="num">${d.hqRate.toLocaleString()}</td><td class="num">${d.storeXRate.toLocaleString()}</td><td class="num">${d.storeORate.toLocaleString()}</td><td class="num">${d.tabRate.toLocaleString()}</td>
+      <td class="num ${ah===0?'zero':''}">${f(ah)}</td><td class="num ${ax===0?'zero':''}">${f(ax)}</td>
+      <td class="num">${ch?ch.toLocaleString():'<span class="zero">-</span>'}</td><td class="num">${cx?cx.toLocaleString():'<span class="zero">-</span>'}</td><td class="num">${co.toLocaleString()}</td><td class="num">${ct?ct.toLocaleString():'<span class="zero">-</span>'}</td>
+      <td class="num hilite">${tot.toLocaleString()}</td>
+    </tr>`;
+  });
+}
+
+// ===== 통계 =====
+const COLORS=['#4f46e5','#0284c7','#059669','#d97706','#dc2626','#7c3aed','#0891b2','#65a30d','#ea580c','#db2777'];
+let currentStatTab='customer';
+function switchStatTab(tab,btn) { currentStatTab=tab; document.querySelectorAll('.right-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderStat(); }
+function renderStat() {
+  const content=document.getElementById('statContent');
+  const month=document.getElementById('statMonth').value||ym;
+  if (currentStatTab==='customer') {
+    const data=companies.map((c,i)=>({ name:c.name, erp:[330000,300000,250000,400000,280000,320000,270000,310000,500000,260000][i]||0, sms:[15000,22000,8000,35000,12000,18000,5000,28000,55000,9000][i]||0, server:[50000,50000,50000,100000,50000,50000,0,50000,100000,0][i]||0, smart:[0,30000,0,50000,0,0,30000,0,80000,0][i]||0, gw:[0,0,20000,30000,0,0,0,20000,50000,0][i]||0, wms:[0,0,0,100000,0,0,0,0,200000,0][i]||0 }));
+    data.forEach(d=>d.total=d.erp+d.sms+d.server+d.smart+d.gw+d.wms);
+    const T={erp:0,sms:0,server:0,smart:0,gw:0,wms:0,total:0};
+    data.forEach(d=>Object.keys(T).forEach(k=>T[k]+=d[k]||0));
+    const max=Math.max(...data.map(d=>d.total));
+    content.innerHTML=`
+      <div class="kpi-grid">
+        <div class="kpi-card bl"><div class="kpi-label">전체 합계</div><div class="kpi-value">${(T.total/10000).toFixed(0)}만원</div><div class="kpi-sub">${month}</div></div>
+        <div class="kpi-card gl"><div class="kpi-label">ERP 합계</div><div class="kpi-value">${(T.erp/10000).toFixed(0)}만원</div></div>
+        <div class="kpi-card yl"><div class="kpi-label">문자 합계</div><div class="kpi-value">${T.sms.toLocaleString()}원</div></div>
+        <div class="kpi-card rl"><div class="kpi-label">WMS 합계</div><div class="kpi-value">${T.wms.toLocaleString()}원</div></div>
+      </div>
+      <div class="stat-table-wrap"><table class="stat-table">
+        <thead><tr><th>업체명</th><th class="th-group">ERP</th><th class="th-group">문자</th><th class="th-group">서버</th><th class="th-group">스마트팩</th><th class="th-group">그룹웨어</th><th class="th-group">WMS</th><th style="background:#fef3c7;color:#92400e">합계</th></tr></thead>
+        <tbody>${data.map(d=>`<tr><td>${d.name}</td><td>${d.erp?d.erp.toLocaleString():'-'}</td><td>${d.sms?d.sms.toLocaleString():'-'}</td><td>${d.server?d.server.toLocaleString():'-'}</td><td>${d.smart?d.smart.toLocaleString():'-'}</td><td>${d.gw?d.gw.toLocaleString():'-'}</td><td>${d.wms?d.wms.toLocaleString():'-'}</td><td style="font-weight:700;color:var(--primary)">${d.total.toLocaleString()}</td></tr>`).join('')}</tbody>
+        <tfoot><tr><td>합계</td><td>${T.erp.toLocaleString()}</td><td>${T.sms.toLocaleString()}</td><td>${T.server.toLocaleString()}</td><td>${T.smart.toLocaleString()}</td><td>${T.gw.toLocaleString()}</td><td>${T.wms.toLocaleString()}</td><td>${T.total.toLocaleString()}</td></tr></tfoot>
+      </table></div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">업체별 청구금액</div><div class="bar-chart">${data.map((d,i)=>`<div class="bar-row"><div class="bar-name" title="${d.name}">${d.name}</div><div class="bar-track"><div class="bar-fill" style="width:${max?Math.round(d.total/max*100):0}%;background:${COLORS[i%10]}"></div></div><div class="bar-val">${(d.total/10000).toFixed(0)}만</div></div>`).join('')}</div></div>
+        <div class="chart-card"><div class="chart-title">항목별 합계</div><div class="bar-chart">${['ERP','문자','서버','스마트팩','그룹웨어','WMS'].map((l,i)=>{const v=[T.erp,T.sms,T.server,T.smart,T.gw,T.wms][i];const mx=Math.max(T.erp,T.sms,T.server,T.smart,T.gw,T.wms);return`<div class="bar-row"><div class="bar-name">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${mx?Math.round(v/mx*100):0}%;background:${COLORS[i]}"></div></div><div class="bar-val">${(v/10000).toFixed(1)}만</div></div>`}).join('')}</div></div>
+      </div>`;
+  } else {
+    content.innerHTML=`<div style="padding:40px;text-align:center;color:var(--muted)">협력업체 통계 데이터를 입력하면 여기에 표시됩니다.</div>`;
+  }
+}
+
+// ===== 유틸 =====
+function g(id) { const e=document.getElementById(id); return e?e.value:''; }
+function st(id,v) { const e=document.getElementById(id); if(e) e.value=v; }
+function val(id) { const e=document.getElementById(id); return e?e.value:''; }
+
+// 초기 렌더
+renderCPList();
+renderStat();
+
+// ===== 견적서 =====
+let quotes = [];
+let nextQuoteId = 1;
+let selectedQuoteId = null;
+let currentQuoteListTab = 'existing';
+
+function filteredQuotes(type, keyword) {
+  keyword = keyword || '';
+  return quotes.filter(function(q) {
+    return q.type === type && (q.companyName.includes(keyword) || q.quoteName.includes(keyword));
+  });
+}
+
+function renderQuoteList(keyword) {
+  keyword = keyword || '';
+  var list = filteredQuotes(currentQuoteListTab, keyword);
+  document.getElementById('quoteCount').textContent = list.length + '건';
+  var el = document.getElementById('quoteList');
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:11px">견적서가 없습니다</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(q) {
+    return '<div class="cp-item ' + (selectedQuoteId===q.id?'selected':'') + '" onclick="selectQuote('+q.id+')">' +
+      '<div><div class="cp-name">' + q.companyName + '</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + q.quoteName + ' · ' + q.date + '</div></div>' +
+      '<span class="badge ' + (q.status==='완료'?'badge-ok':'badge-end') + '">' + q.status + '</span></div>';
+  }).join('');
+}
+function filterQuote(v) { renderQuoteList(v); }
+function switchQuoteListTab(tab, btn) {
+  currentQuoteListTab = tab;
+  btn.closest('div').querySelectorAll('.fee-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  selectedQuoteId = null;
+  hideQuoteContent();
+  renderQuoteList();
+}
+function hideQuoteContent() {
+  document.getElementById('quoteEmpty').style.display = '';
+  document.getElementById('quoteContent').classList.remove('visible');
+}
+function selectQuote(id) {
+  selectedQuoteId = id;
+  renderQuoteList();
+  showQuoteDetail();
+}
+function openNewQuote(type) {
+  selectedQuoteId = null;
+  currentQuoteListTab = type;
+  document.querySelectorAll('#page-quote .fee-tab').forEach(function(b,i){
+    b.classList.toggle('active', (i===0&&type==='existing')||(i===1&&type==='new'));
+  });
+  renderQuoteList();
+  showQuoteFormNew(type);
+}
+function showQuoteDetail() {
+  var q = quotes.find(function(x){ return x.id===selectedQuoteId; });
+  document.getElementById('quoteEmpty').style.display = 'none';
+  document.getElementById('quoteContent').classList.add('visible');
+  document.getElementById('quoteTitle').textContent = q.companyName + ' · ' + q.quoteName;
+  document.getElementById('quoteButtons').innerHTML =
+    '<div style="display:flex;gap:6px">' +
+    '<button class="btn btn-primary" onclick="editQuote()">✏️ 수정</button>' +
+    '<button class="btn btn-red" onclick="deleteQuote()">🗑️ 삭제</button></div>';
+  var total = (q.items||[]).reduce(function(s,it){ return s+(+it.qty||0)*(+it.price||0); },0);
+  var rows = (q.items||[]).map(function(it,i){
+    return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+it.name+'</td>' +
+      '<td style="text-align:right">'+it.qty+'</td>' +
+      '<td style="text-align:right">'+((+it.price||0).toLocaleString())+'</td>' +
+      '<td style="text-align:right;font-weight:600">'+((+it.qty||0)*(+it.price||0)).toLocaleString()+'</td></tr>';
+  }).join('');
+  document.getElementById('quoteFormBody').innerHTML =
+    '<div class="form-section"><div class="form-section-title fst-basic">📄 기본정보</div><div class="form-section-body">' +
+    '<div class="form-grid fg-3">' +
+    '<div class="form-field"><label>업체명</label><input class="f-input" value="'+q.companyName+'" readonly></div>' +
+    '<div class="form-field"><label>견적명</label><input class="f-input" value="'+q.quoteName+'" readonly></div>' +
+    '<div class="form-field"><label>날짜</label><input class="f-input" value="'+q.date+'" readonly></div>' +
+    '<div class="form-field"><label>담당자</label><input class="f-input" value="'+(q.manager||'')+'" readonly></div>' +
+    '<div class="form-field"><label>상태</label><input class="f-input" value="'+q.status+'" readonly></div>' +
+    (q.type==='new'?'<div class="form-field"><label>연락처</label><input class="f-input" value="'+(q.contact||'')+'" readonly></div>':'') +
+    '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-info">📋 견적 항목</div>' +
+    '<div class="form-section-body" style="padding:0">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:36px">No</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">항목명</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:60px">수량</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:100px">단가(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:110px">금액(원)</th>' +
+    '</tr></thead><tbody>'+rows+'</tbody>' +
+    '<tfoot><tr style="background:var(--primary-light)">' +
+    '<td colspan="4" style="padding:8px 10px;font-weight:700;color:var(--primary-dark)">합계</td>' +
+    '<td style="padding:8px 10px;font-weight:700;color:var(--primary);text-align:right">'+total.toLocaleString()+'</td>' +
+    '</tr></tfoot></table></div></div>' +
+    (q.memo?'<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div><div class="form-section-body"><p style="font-size:11px;white-space:pre-wrap">'+q.memo+'</p></div></div>':'');
+}
+
+function showQuoteFormNew(type) {
+  document.getElementById('quoteEmpty').style.display = 'none';
+  document.getElementById('quoteContent').classList.add('visible');
+  document.getElementById('quoteTitle').textContent = type==='existing' ? '기존 업체 견적서 작성' : '신규 업체 견적서 작성';
+  document.getElementById('quoteButtons').innerHTML =
+    '<div style="display:flex;gap:6px">' +
+    '<button class="btn btn-primary" onclick="saveQuote(\'' + type + '\')">💾 저장</button>' +
+    '<button class="btn btn-outline" onclick="hideQuoteContent()">취소</button></div>';
+  var compSel = type==='existing'
+    ? '<select class="f-select" id="q_company">'+companies.map(function(c){ return '<option>'+c.name+'</option>'; }).join('')+'</select>'
+    : '<input class="f-input" id="q_company" placeholder="신규 업체명">';
+  document.getElementById('quoteFormBody').innerHTML =
+    '<div class="form-section"><div class="form-section-title fst-basic">📄 기본정보</div><div class="form-section-body">' +
+    '<div class="form-grid fg-3">' +
+    '<div class="form-field"><label>업체명 *</label>'+compSel+'</div>' +
+    '<div class="form-field"><label>견적명 *</label><input class="f-input" id="q_name" placeholder="견적명"></div>' +
+    '<div class="form-field"><label>날짜</label><input class="f-input" id="q_date" type="date" value="'+today.toISOString().split("T")[0]+'"></div>' +
+    '<div class="form-field"><label>담당자</label><input class="f-input" id="q_manager"></div>' +
+    '<div class="form-field"><label>상태</label><select class="f-select" id="q_status"><option>작성중</option><option>완료</option></select></div>' +
+    (type==='new'?'<div class="form-field"><label>연락처</label><input class="f-input" id="q_contact"></div>':'') +
+    '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-info" style="display:flex;align-items:center;justify-content:space-between">' +
+    '<span>📋 견적 항목</span><button class="btn btn-outline" style="font-size:10px;padding:3px 8px" onclick="addQuoteRow()">+ 항목 추가</button></div>' +
+    '<div class="form-section-body" style="padding:0">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:36px">No</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">항목명</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:60px">수량</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:100px">단가(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:110px">금액(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:40px"></th>' +
+    '</tr></thead><tbody id="quoteItemBody"><tr id="qrow_0">' +
+    '<td style="text-align:center;padding:4px">1</td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%" id="qi_name_0" placeholder="항목명"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_qty_0" type="number" value="1" oninput="calcQuoteTotal()"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_price_0" type="number" value="0" oninput="calcQuoteTotal()"></td>' +
+    '<td style="padding:4px;text-align:right;font-weight:600" id="qi_amt_0">0</td>' +
+    '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeQuoteRow(0)">✕</button></td>' +
+    '</tr></tbody>' +
+    '<tfoot><tr style="background:var(--primary-light)"><td colspan="4" style="padding:8px 10px;font-weight:700;color:var(--primary-dark)">합계</td>' +
+    '<td style="padding:8px 10px;font-weight:700;color:var(--primary);text-align:right" id="quoteTotalAmt">0</td><td></td></tr></tfoot>' +
+    '</table></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div>' +
+    '<div class="form-section-body"><textarea class="f-textarea" id="q_memo" rows="3" style="width:100%" placeholder="메모 입력"></textarea></div></div>';
+}
+function editQuote() {
+  var q = quotes.find(function(x){ return x.id===selectedQuoteId; });
+  showQuoteFormNew(q.type);
+  document.getElementById('quoteTitle').textContent = q.companyName + ' · ' + q.quoteName;
+  document.getElementById('quoteButtons').innerHTML =
+    '<div style="display:flex;gap:6px">' +
+    '<button class="btn btn-primary" onclick="updateQuote()">💾 저장</button>' +
+    '<button class="btn btn-outline" onclick="selectQuote('+selectedQuoteId+')">취소</button></div>';
+  if (document.getElementById('q_company').tagName === 'SELECT') {
+    document.getElementById('q_company').value = q.companyName;
+  } else {
+    document.getElementById('q_company').value = q.companyName;
+  }
+  document.getElementById('q_name').value = q.quoteName;
+  document.getElementById('q_date').value = q.date;
+  document.getElementById('q_manager').value = q.manager||'';
+  document.getElementById('q_status').value = q.status;
+  if (document.getElementById('q_contact')) document.getElementById('q_contact').value = q.contact||'';
+  var tbody = document.getElementById('quoteItemBody');
+  tbody.innerHTML = '';
+  (q.items||[]).forEach(function(it,i){
+    var tr = document.createElement('tr');
+    tr.id = 'qrow_'+i;
+    tr.innerHTML = '<td style="text-align:center;padding:4px">'+(i+1)+'</td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%" id="qi_name_'+i+'" value="'+it.name+'" placeholder="항목명"></td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_qty_'+i+'" type="number" value="'+(it.qty||1)+'" oninput="calcQuoteTotal()"></td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_price_'+i+'" type="number" value="'+(it.price||0)+'" oninput="calcQuoteTotal()"></td>' +
+      '<td style="padding:4px;text-align:right;font-weight:600" id="qi_amt_'+i+'">'+((+it.qty||1)*(+it.price||0)).toLocaleString()+'</td>' +
+      '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeQuoteRow('+i+')">✕</button></td>';
+    tbody.appendChild(tr);
+  });
+  calcQuoteTotal();
+  if (document.getElementById('q_memo')) document.getElementById('q_memo').value = q.memo||'';
+}
+function addQuoteRow() {
+  var tbody = document.getElementById('quoteItemBody');
+  var i = tbody.rows.length;
+  var tr = document.createElement('tr');
+  tr.id = 'qrow_'+i;
+  tr.innerHTML = '<td style="text-align:center;padding:4px">'+(i+1)+'</td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%" id="qi_name_'+i+'" placeholder="항목명"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_qty_'+i+'" type="number" value="1" oninput="calcQuoteTotal()"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="qi_price_'+i+'" type="number" value="0" oninput="calcQuoteTotal()"></td>' +
+    '<td style="padding:4px;text-align:right;font-weight:600" id="qi_amt_'+i+'">0</td>' +
+    '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeQuoteRow('+i+')">✕</button></td>';
+  tbody.appendChild(tr);
+  calcQuoteTotal();
+}
+function removeQuoteRow(i) { var tr=document.getElementById('qrow_'+i); if(tr) tr.remove(); calcQuoteTotal(); }
+function calcQuoteTotal() {
+  var total=0;
+  document.querySelectorAll('#quoteItemBody tr').forEach(function(tr){
+    var idx=tr.id.split('_')[1];
+    var qty=+(document.getElementById('qi_qty_'+idx)||{}).value||0;
+    var price=+(document.getElementById('qi_price_'+idx)||{}).value||0;
+    var amt=qty*price;
+    var el=document.getElementById('qi_amt_'+idx); if(el) el.textContent=amt.toLocaleString();
+    total+=amt;
+  });
+  var el=document.getElementById('quoteTotalAmt'); if(el) el.textContent=total.toLocaleString();
+}
+function readQuoteItems() {
+  return Array.from(document.querySelectorAll('#quoteItemBody tr')).map(function(tr){
+    var idx=tr.id.split('_')[1];
+    return {name:(document.getElementById('qi_name_'+idx)||{}).value||'',qty:+(document.getElementById('qi_qty_'+idx)||{}).value||1,price:+(document.getElementById('qi_price_'+idx)||{}).value||0};
+  });
+}
+function saveQuote(type) {
+  var companyName = val('q_company');
+  if (!companyName||!val('q_name')) { alert('업체명과 견적명을 입력하세요.'); return; }
+  var q = {id:nextQuoteId++,type:type,companyName:companyName,quoteName:val('q_name'),date:val('q_date'),manager:val('q_manager'),status:val('q_status'),contact:val('q_contact'),memo:val('q_memo'),items:readQuoteItems()};
+  quotes.push(q);
+  selectedQuoteId=q.id;
+  renderQuoteList();
+  showQuoteDetail();
+}
+function updateQuote() {
+  var idx=quotes.findIndex(function(x){ return x.id===selectedQuoteId; }); if(idx<0) return;
+  quotes[idx]=Object.assign({},quotes[idx],{companyName:val('q_company'),quoteName:val('q_name'),date:val('q_date'),manager:val('q_manager'),status:val('q_status'),contact:val('q_contact'),memo:val('q_memo'),items:readQuoteItems()});
+  renderQuoteList(); showQuoteDetail();
+}
+function deleteQuote() {
+  var q=quotes.find(function(x){ return x.id===selectedQuoteId; });
+  if(!q||!confirm('"'+q.companyName+' · '+q.quoteName+'" 견적서를 삭제하시겠습니까?')) return;
+  quotes=quotes.filter(function(x){ return x.id!==selectedQuoteId; });
+  selectedQuoteId=null; hideQuoteContent(); renderQuoteList();
+}
+
+// ===== 발주서 =====
+var orders=[], nextOrderId=1, selectedOrderId=null;
+function renderOrderList(keyword) {
+  keyword=keyword||'';
+  var list=orders.filter(function(o){ return o.companyName.includes(keyword)||o.orderName.includes(keyword); });
+  document.getElementById('orderCount').textContent=list.length+'건';
+  var el=document.getElementById('orderList');
+  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#94a3b8;font-size:11px">발주서가 없습니다</div>'; return; }
+  el.innerHTML=list.map(function(o){
+    return '<div class="cp-item '+(selectedOrderId===o.id?'selected':'')+'" onclick="selectOrder('+o.id+')">' +
+      '<div><div class="cp-name">'+o.companyName+'</div>' +
+      '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+o.orderName+' · '+o.date+'</div></div>' +
+      '<span class="badge '+(o.status==='완료'?'badge-ok':'badge-end')+'">'+o.status+'</span></div>';
+  }).join('');
+}
+function filterOrder(v){ renderOrderList(v); }
+function hideOrderContent(){ document.getElementById('orderEmpty').style.display=''; document.getElementById('orderContent').classList.remove('visible'); }
+function selectOrder(id){ selectedOrderId=id; renderOrderList(); showOrderDetail(); }
+function openNewOrder(){ selectedOrderId=null; renderOrderList(); showOrderFormNew(); }
+function showOrderDetail() {
+  var o=orders.find(function(x){ return x.id===selectedOrderId; });
+  document.getElementById('orderEmpty').style.display='none';
+  document.getElementById('orderContent').classList.add('visible');
+  document.getElementById('orderTitle').textContent=o.companyName+' · '+o.orderName;
+  document.getElementById('orderButtons').innerHTML='<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="editOrder()">✏️ 수정</button><button class="btn btn-red" onclick="deleteOrder()">🗑️ 삭제</button></div>';
+  var total=(o.items||[]).reduce(function(s,it){ return s+(+it.qty||0)*(+it.price||0); },0);
+  var rows=(o.items||[]).map(function(it,i){
+    return '<tr><td style="text-align:center">'+(i+1)+'</td><td>'+it.name+'</td><td style="text-align:right">'+it.qty+'</td><td style="text-align:right">'+((+it.price||0).toLocaleString())+'</td><td style="text-align:right;font-weight:600">'+((+it.qty||0)*(+it.price||0)).toLocaleString()+'</td></tr>';
+  }).join('');
+  document.getElementById('orderFormBody').innerHTML=
+    '<div class="form-section"><div class="form-section-title fst-basic">📋 기본정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
+    '<div class="form-field"><label>발주 업체명</label><input class="f-input" value="'+o.companyName+'" readonly></div>' +
+    '<div class="form-field"><label>발주명</label><input class="f-input" value="'+o.orderName+'" readonly></div>' +
+    '<div class="form-field"><label>날짜</label><input class="f-input" value="'+o.date+'" readonly></div>' +
+    '<div class="form-field"><label>담당자</label><input class="f-input" value="'+(o.manager||'')+'" readonly></div>' +
+    '<div class="form-field"><label>납기일</label><input class="f-input" value="'+(o.dueDate||'')+'" readonly></div>' +
+    '<div class="form-field"><label>상태</label><input class="f-input" value="'+o.status+'" readonly></div>' +
+    '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-info">📦 발주 항목</div><div class="form-section-body" style="padding:0">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:36px">No</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">항목명</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:60px">수량</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:100px">단가(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:110px">금액(원)</th>' +
+    '</tr></thead><tbody>'+rows+'</tbody>' +
+    '<tfoot><tr style="background:var(--primary-light)"><td colspan="4" style="padding:8px 10px;font-weight:700;color:var(--primary-dark)">합계</td>' +
+    '<td style="padding:8px 10px;font-weight:700;color:var(--primary);text-align:right">'+total.toLocaleString()+'</td></tr></tfoot>' +
+    '</table></div></div>' +
+    (o.memo?'<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div><div class="form-section-body"><p style="font-size:11px;white-space:pre-wrap">'+o.memo+'</p></div></div>':'');
+}
+function showOrderFormNew(o) {
+  document.getElementById('orderEmpty').style.display='none';
+  document.getElementById('orderContent').classList.add('visible');
+  document.getElementById('orderTitle').textContent= o ? o.companyName+' · '+o.orderName+' 수정' : '신규 발주서 작성';
+  document.getElementById('orderButtons').innerHTML= o
+    ? '<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="updateOrder()">💾 저장</button><button class="btn btn-outline" onclick="selectOrder('+selectedOrderId+')">취소</button></div>'
+    : '<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="saveOrder()">💾 저장</button><button class="btn btn-outline" onclick="hideOrderContent()">취소</button></div>';
+  var itemRows=(o?o.items:[{name:'',qty:1,price:0}]).map(function(it,i){
+    return '<tr id="orow_'+i+'"><td style="text-align:center;padding:4px">'+(i+1)+'</td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%" id="oi_name_'+i+'" value="'+it.name+'" placeholder="항목명"></td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="oi_qty_'+i+'" type="number" value="'+(it.qty||1)+'" oninput="calcOrderTotal()"></td>' +
+      '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="oi_price_'+i+'" type="number" value="'+(it.price||0)+'" oninput="calcOrderTotal()"></td>' +
+      '<td style="padding:4px;text-align:right;font-weight:600" id="oi_amt_'+i+'">'+((+it.qty||1)*(+it.price||0)).toLocaleString()+'</td>' +
+      '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeOrderRow('+i+')">✕</button></td></tr>';
+  }).join('');
+  document.getElementById('orderFormBody').innerHTML=
+    '<div class="form-section"><div class="form-section-title fst-basic">📋 기본정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
+    '<div class="form-field"><label>발주 업체명 *</label><input class="f-input" id="o_company" value="'+(o?o.companyName:'')+'" placeholder="업체명"></div>' +
+    '<div class="form-field"><label>발주명 *</label><input class="f-input" id="o_name" value="'+(o?o.orderName:'')+'" placeholder="발주명"></div>' +
+    '<div class="form-field"><label>날짜</label><input class="f-input" id="o_date" type="date" value="'+(o?o.date:today.toISOString().split("T")[0])+'"></div>' +
+    '<div class="form-field"><label>담당자</label><input class="f-input" id="o_manager" value="'+(o?o.manager||'':'')+'" placeholder="담당자명"></div>' +
+    '<div class="form-field"><label>납기일</label><input class="f-input" id="o_dueDate" type="date" value="'+(o?o.dueDate||'':'')+'" ></div>' +
+    '<div class="form-field"><label>상태</label><select class="f-select" id="o_status"><option '+((!o||o.status==='작성중')?'selected':'')+'>작성중</option><option '+(o&&o.status==='완료'?'selected':'')+'>완료</option></select></div>' +
+    '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-info" style="display:flex;align-items:center;justify-content:space-between">' +
+    '<span>📦 발주 항목</span><button class="btn btn-outline" style="font-size:10px;padding:3px 8px" onclick="addOrderRow()">+ 항목 추가</button></div>' +
+    '<div class="form-section-body" style="padding:0">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:36px">No</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">항목명</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:60px">수량</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:100px">단가(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:110px">금액(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:40px"></th>' +
+    '</tr></thead><tbody id="orderItemBody">'+itemRows+'</tbody>' +
+    '<tfoot><tr style="background:var(--primary-light)"><td colspan="4" style="padding:8px 10px;font-weight:700;color:var(--primary-dark)">합계</td>' +
+    '<td style="padding:8px 10px;font-weight:700;color:var(--primary);text-align:right" id="orderTotalAmt">0</td><td></td></tr></tfoot>' +
+    '</table></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div>' +
+    '<div class="form-section-body"><textarea class="f-textarea" id="o_memo" rows="3" style="width:100%" placeholder="메모 입력">'+(o?o.memo||'':'')+'</textarea></div></div>';
+  calcOrderTotal();
+}
+function editOrder(){ var o=orders.find(function(x){ return x.id===selectedOrderId; }); showOrderFormNew(o); }
+function addOrderRow(){
+  var tbody=document.getElementById('orderItemBody'); var i=tbody.rows.length;
+  var tr=document.createElement('tr'); tr.id='orow_'+i;
+  tr.innerHTML='<td style="text-align:center;padding:4px">'+(i+1)+'</td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%" id="oi_name_'+i+'" placeholder="항목명"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="oi_qty_'+i+'" type="number" value="1" oninput="calcOrderTotal()"></td>' +
+    '<td style="padding:4px"><input class="f-input" style="width:100%;text-align:right" id="oi_price_'+i+'" type="number" value="0" oninput="calcOrderTotal()"></td>' +
+    '<td style="padding:4px;text-align:right;font-weight:600" id="oi_amt_'+i+'">0</td>' +
+    '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeOrderRow('+i+')">✕</button></td>';
+  tbody.appendChild(tr); calcOrderTotal();
+}
+function removeOrderRow(i){ var tr=document.getElementById('orow_'+i); if(tr) tr.remove(); calcOrderTotal(); }
+function calcOrderTotal(){
+  var total=0;
+  document.querySelectorAll('#orderItemBody tr').forEach(function(tr){
+    var idx=tr.id.split('_')[1];
+    var qty=+(document.getElementById('oi_qty_'+idx)||{}).value||0;
+    var price=+(document.getElementById('oi_price_'+idx)||{}).value||0;
+    var amt=qty*price;
+    var el=document.getElementById('oi_amt_'+idx); if(el) el.textContent=amt.toLocaleString();
+    total+=amt;
+  });
+  var el=document.getElementById('orderTotalAmt'); if(el) el.textContent=total.toLocaleString();
+}
+function readOrderItems(){
+  return Array.from(document.querySelectorAll('#orderItemBody tr')).map(function(tr){
+    var idx=tr.id.split('_')[1];
+    return {name:(document.getElementById('oi_name_'+idx)||{}).value||'',qty:+(document.getElementById('oi_qty_'+idx)||{}).value||1,price:+(document.getElementById('oi_price_'+idx)||{}).value||0};
+  });
+}
+function saveOrder(){
+  if(!val('o_company')||!val('o_name')){ alert('업체명과 발주명을 입력하세요.'); return; }
+  var o={id:nextOrderId++,companyName:val('o_company'),orderName:val('o_name'),date:val('o_date'),manager:val('o_manager'),dueDate:val('o_dueDate'),status:val('o_status'),memo:val('o_memo'),items:readOrderItems()};
+  orders.push(o); selectedOrderId=o.id; renderOrderList(); showOrderDetail();
+}
+function updateOrder(){
+  var idx=orders.findIndex(function(x){ return x.id===selectedOrderId; }); if(idx<0) return;
+  orders[idx]=Object.assign({},orders[idx],{companyName:val('o_company'),orderName:val('o_name'),date:val('o_date'),manager:val('o_manager'),dueDate:val('o_dueDate'),status:val('o_status'),memo:val('o_memo'),items:readOrderItems()});
+  renderOrderList(); showOrderDetail();
+}
+function deleteOrder(){
+  var o=orders.find(function(x){ return x.id===selectedOrderId; });
+  if(!o||!confirm('"'+o.companyName+' · '+o.orderName+'" 발주서를 삭제하시겠습니까?')) return;
+  orders=orders.filter(function(x){ return x.id!==selectedOrderId; });
+  selectedOrderId=null; hideOrderContent(); renderOrderList();
+}
+
+renderQuoteList();
+renderOrderList();
+</script>
+</body>
+</html>
