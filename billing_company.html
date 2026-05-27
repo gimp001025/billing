@@ -656,27 +656,27 @@ function renderFeeSummaryHTML(companyId) {
     {label:'그룹웨어',value:gw,tab:'gw'},
     {label:'WMS',value:wms,tab:'wms'},
   ];
-  return \`
+  return `
     <div class="form-section" style="margin-top:0">
       <div class="fee-section-title fst-partner" style="padding:7px 12px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border)">
         📊 이번달 사용료 요약
-        <span style="font-size:10px;font-weight:400;color:var(--muted)">\${ym} 기준 · 저장된 데이터 기준</span>
+        <span style="font-size:10px;font-weight:400;color:var(--muted)">${ym} 기준 · 저장된 데이터 기준</span>
       </div>
       <div class="form-section-body">
         <div class="fee-summary-grid">
-          \${items.map(it=>\`
-            <div class="fsc" onclick="goToFeeTab('\${it.tab}')" style="cursor:pointer">
-              <span class="fsc-label">\${it.label}</span>
-              <span class="fsc-value \${it.value===0?'zero':''}">\${fmt(it.value)}</span>
+          ${items.map(it=>`
+            <div class="fsc" onclick="goToFeeTab('${it.tab}')" style="cursor:pointer">
+              <span class="fsc-label">${it.label}</span>
+              <span class="fsc-value ${it.value===0?'zero':''}">${fmt(it.value)}</span>
               <span class="fsc-link">입력하기 →</span>
-            </div>\`).join('')}
+            </div>`).join('')}
           <div class="fsc fsc-total">
             <span class="fsc-label">이번달 총 합계</span>
-            <span class="fsc-value">\${total?total.toLocaleString()+'원':'미입력'}</span>
+            <span class="fsc-value">${total?total.toLocaleString()+'원':'미입력'}</span>
           </div>
         </div>
       </div>
-    </div>\`;
+    </div>`;
 }
 
 function goToFeeTab(tab) {
@@ -1132,7 +1132,7 @@ function showQuoteFormNew(type) {
   document.getElementById('quoteTitle').textContent = type==='existing' ? '기존 업체 견적서 작성' : '신규 업체 견적서 작성';
   document.getElementById('quoteButtons').innerHTML =
     '<div style="display:flex;gap:6px">' +
-    '<button class="btn btn-primary" onclick="saveQuote(''+type+'')">💾 저장</button>' +
+    '<button class="btn btn-primary" onclick="saveQuote(\'' + type + '\')">💾 저장</button>' +
     '<button class="btn btn-outline" onclick="hideQuoteContent()">취소</button></div>';
   var compSel = type==='existing'
     ? '<select class="f-select" id="q_company">'+companies.map(function(c){ return '<option>'+c.name+'</option>'; }).join('')+'</select>'
