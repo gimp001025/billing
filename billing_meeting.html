@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>업체과금 관리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f0f2f5;font-size:13px;}
+.topbar{background:#fff;border-bottom:1px solid #dde1e7;padding:0 20px;height:44px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-size:16px;font-weight:700;color:#222;}
+.breadcrumb{font-size:12px;color:#999;}
+.breadcrumb span{color:#1890ff;}
+.page{padding:16px;}
+.card{background:#fff;border:1px solid #dde1e7;border-radius:6px;}
+.card-header{padding:8px 16px;border-bottom:1px solid #eef0f3;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1890ff;}
+.filter-row{padding:8px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid #eef0f3;}
+.filter-label{font-size:11px;color:#555;font-weight:500;white-space:nowrap;}
+.filter-label.req::before{content:"*";color:#ff4d4f;margin-right:1px;}
+.filter-row input[type=text]{padding:3px 6px;border:1px solid #d9d9d9;border-radius:3px;font-size:11px;width:80px;outline:none;}
+.filter-row input:focus{border-color:#1890ff;}
+.filter-row select{padding:3px 4px;border:1px solid #d9d9d9;border-radius:3px;font-size:11px;outline:none;background:#fff;}
+.filter-row select:focus{border-color:#1890ff;}
+.filter-divider{width:1px;height:16px;background:#e8eaed;margin:0 2px;}
+.radio-row{padding:6px 16px;display:flex;gap:16px;border-bottom:1px solid #eef0f3;}
+.radio-row label{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;color:#333;}
+.radio-row input[type=radio]{accent-color:#1890ff;width:12px;height:12px;}
+.btn-group{display:flex;gap:5px;margin-left:auto;}
+.btn{padding:4px 10px;border-radius:3px;font-size:11px;cursor:pointer;border:1px solid;display:flex;align-items:center;gap:3px;font-weight:500;white-space:nowrap;}
+.btn-default{background:#fff;border-color:#d9d9d9;color:#333;}
+.btn-default:hover{border-color:#1890ff;color:#1890ff;}
+.btn-primary{background:#1890ff;border-color:#1890ff;color:#fff;}
+.btn-save{background:#52c41a;border-color:#52c41a;color:#fff;}
+.btn-danger{background:#ff4d4f;border-color:#ff4d4f;color:#fff;}
+.btn-calc{background:#13c2c2;border-color:#13c2c2;color:#fff;}
+.btn-calc:hover{background:#08979c;}
+.table-wrap{overflow-x:auto;}
+table{border-collapse:collapse;width:100%;font-size:11px;min-width:1300px;}
+th,td{border:1px solid #e8eaed;padding:5px 7px;text-align:center;white-space:nowrap;}
+th{background:#f5f7fa;font-weight:600;color:#444;font-size:11px;}
+td{color:#333;}
+tbody tr:hover td{background:#fafcff;}
+.th-blue{background:#e6f7ff !important;color:#096dd9 !important;}
+.th-green{background:#f6ffed !important;color:#389e0d !important;}
+.th-orange{background:#fff7e6 !important;color:#d46b08 !important;}
+.th-purple{background:#f9f0ff !important;color:#531dab !important;}
+.th-red{background:#fff1f0 !important;color:#cf1322 !important;}
+.th-teal{background:#e6fffb !important;color:#006d75 !important;}
+.td-blue{background:#f0f8ff;}
+.td-green{background:#f6fff0;}
+.td-orange{background:#fffbf0;}
+.td-purple{background:#fdf6ff;}
+.td-red{background:#fff5f5;}
+.td-teal{background:#e6fffb;font-weight:700;}
+.empty{padding:60px;color:#bbb;text-align:center;font-size:12px;line-height:2;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">업체과금 관리</div>
+  <div class="breadcrumb">HOME &gt; <span>업체과금 관리</span></div>
+</div>
+
+<div class="page">
+<div class="card">
+  <div class="card-header">
+    ⚙ 과금 정보
+    <div class="btn-group">
+      <button class="btn btn-default">📋 테스트</button>
+      <button class="btn btn-default">📊 엑셀</button>
+      <button class="btn btn-calc" onclick="doCalc()">🖩 계산</button>
+      <button class="btn btn-default">🔍 불러오기</button>
+      <button class="btn btn-primary">✚ 신규</button>
+      <button class="btn btn-save">💾 저장</button>
+      <button class="btn btn-danger">🗑 삭제</button>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-label req">기준년월</span>
+    <input type="text" id="ym" value="2026-05" />
+    <div class="filter-divider"></div>
+    <span class="filter-label">발행일자</span>
+    <select style="width:88px;"><option value="">선택</option><option>2026-05-01</option><option>2026-05-15</option><option>2026-05-31</option></select>
+    <div class="filter-divider"></div>
+    <span class="filter-label">적요수정유/무</span>
+    <select style="width:60px;"><option value="">선택</option><option>유</option><option>무</option></select>
+    <div class="filter-divider"></div>
+    <span class="filter-label">메세지</span>
+    <select style="width:60px;"><option value="">선택</option><option>발송</option><option>미발송</option></select>
+    <div class="filter-divider"></div>
+    <span class="filter-label">스마트팩</span>
+    <select style="width:60px;"><option value="">선택</option><option>유</option><option>무</option></select>
+  </div>
+
+  <div class="radio-row">
+    <label><input type="radio" name="view" value="all" checked> 전체</label>
+    <label><input type="radio" name="view" value="detail"> 세부</label>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2">순번</th>
+          <th rowspan="2">적요수정유/무</th>
+          <th rowspan="2">사업자번호</th>
+          <th rowspan="2">사업자명</th>
+          <th rowspan="2">업체명</th>
+          <th colspan="5" class="th-blue">사용자수</th>
+          <th colspan="2" class="th-green">기본제공유저</th>
+          <th colspan="4" class="th-orange">유저수비용</th>
+          <th colspan="2" class="th-purple">추가유저수</th>
+          <th colspan="4" class="th-red">추가 유저수비용</th>
+          <th class="th-teal">합계</th>
+        </tr>
+        <tr>
+          <th class="th-blue">본사</th>
+          <th class="th-blue">매장(결제X)</th>
+          <th class="th-blue">매장(결제O)</th>
+          <th class="th-blue">태블릿</th>
+          <th class="th-blue">장비</th>
+          <th class="th-green">본사</th>
+          <th class="th-green">매장</th>
+          <th class="th-orange">본사</th>
+          <th class="th-orange">매장(결제X)</th>
+          <th class="th-orange">매장(결제O)</th>
+          <th class="th-orange">태블릿</th>
+          <th class="th-purple">본사</th>
+          <th class="th-purple">매장(결제X)</th>
+          <th class="th-red">본사</th>
+          <th class="th-red">매장(결제X)</th>
+          <th class="th-red">매장(결제O)</th>
+          <th class="th-red">태블릿</th>
+          <th class="th-teal">합계</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="22" class="empty">표시할 자료가 없습니다.<br>계산 버튼을 클릭하면 데이터가 표시됩니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<script>
+const companies = [
+  {id:1, type:"유저수체크", bizNo:"8048602248",  bizName:"주식회사 리아드",                        name:"리아드",             basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:25000, feeStoreO:0,     feeTablet:0},
+  {id:2, type:"유저수체크", bizNo:"5488803642",  bizName:"주식회사 마티래",                        name:"마티레",             basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:0,     feeTablet:0},
+  {id:3, type:"유저수체크", bizNo:"4028801993",  bizName:"주식회사 툴앤코",                        name:"툴앤코",             basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:0,     feeTablet:0},
+  {id:4, type:"유저수체크", bizNo:"6451202347",  bizName:"제이제이 인터내셔날(JJ International)", name:"제이제이인터내셔날", basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:0,     feeTablet:0},
+  {id:5, type:"유저수체크", bizNo:"1708802509",  bizName:"주식회사 가온패션",                      name:"가온패션",           basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:0,     feeTablet:0},
+  {id:6, type:"유저수체크", bizNo:"1578601046",  bizName:"주식회사 하크어패럴",                    name:"하크어패럴",         basicBonsa:10, basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:40000, feeTablet:0},
+  {id:7, type:"유저수체크", bizNo:"3828601579",  bizName:"주식회사 이안리테일",                    name:"이안리테일",         basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:40000, feeTablet:0},
+  {id:8, type:"유저수체크", bizNo:"3618802158",  bizName:"글로니",                                 name:"글로니",             basicBonsa:5,  basicStore:5, feeBonsa:20000, feeStoreX:30000, feeStoreO:40000, feeTablet:90000},
+  {id:9, type:"월정액",    bizNo:"2118810329",  bizName:"주식회사 에스제이그룹",                  name:"에스제이그룹(랑골)", basicBonsa:0,  basicStore:0, feeBonsa:0,     feeStoreX:0,     feeStoreO:0,     feeTablet:0},
+  {id:10,type:"월정액",    bizNo:"2118810329",  bizName:"주식회사 에스제이그룹",                  name:"에스제이그룹(LCDC)", basicBonsa:0,  basicStore:0, feeBonsa:0,     feeStoreX:0,     feeStoreO:0,     feeTablet:0},
+];
+
+const calcFixed = {
+  1:{bonsa:6,storeX:18,storeO:0,tablet:0,device:0},
+  2:{bonsa:2,storeX:1, storeO:0,tablet:0,device:0},
+  3:{bonsa:5,storeX:0, storeO:0,tablet:0,device:0},
+  4:{bonsa:3,storeX:0, storeO:0,tablet:0,device:0},
+  5:{bonsa:6,storeX:2, storeO:0,tablet:0,device:0},
+  6:{bonsa:9,storeX:7, storeO:2,tablet:0,device:0},
+  7:{bonsa:9,storeX:3, storeO:1,tablet:0,device:0},
+  8:{bonsa:14,storeX:2,storeO:3,tablet:4,device:0},
+  9:{bonsa:117,storeX:96,storeO:0,tablet:0,device:0},
+  10:{bonsa:20,storeX:5,storeO:0,tablet:0,device:0},
+};
+
+let isCalcDone = false;
+
+function doCalc() {
+  isCalcDone = true;
+  renderTable();
+}
+
+function n(v){ return (!v && v!==0) ? '' : (v===0 ? '' : Number(v).toLocaleString()); }
+function nz(v){ return Number(v).toLocaleString(); }
+
+function renderTable() {
+  const tbody = document.getElementById("tbody");
+  if (!isCalcDone) {
+    tbody.innerHTML = '<tr><td colspan="22" class="empty">표시할 자료가 없습니다.<br>계산 버튼을 클릭하면 데이터가 표시됩니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = companies.map((c, i) => {
+    const d = calcFixed[c.id] || {bonsa:0,storeX:0,storeO:0,tablet:0,device:0};
+    const uBonsa=d.bonsa, uStoreX=d.storeX, uStoreO=d.storeO, uTablet=d.tablet, uDevice=d.device;
+    const exBonsa  = Math.max(0, uBonsa  - c.basicBonsa);
+    const exStoreX = Math.max(0, uStoreX - c.basicStore);
+    const costBonsa  = exBonsa  * c.feeBonsa;
+    const costStoreX = exStoreX * c.feeStoreX;
+    const costStoreO = uStoreO  * c.feeStoreO;
+    const costTablet = uTablet  * c.feeTablet;
+    const total = costBonsa + costStoreX + costStoreO + costTablet;
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${c.type}</td>
+      <td>${c.bizNo}</td>
+      <td style="text-align:left;padding-left:8px;">${c.bizName}</td>
+      <td style="text-align:left;padding-left:8px;font-weight:500;">${c.name}</td>
+      <td class="td-blue">${n(uBonsa)}</td>
+      <td class="td-blue">${n(uStoreX)}</td>
+      <td class="td-blue">${n(uStoreO)}</td>
+      <td class="td-blue">${n(uTablet)}</td>
+      <td class="td-blue">${n(uDevice)}</td>
+      <td class="td-green">${n(c.basicBonsa)}</td>
+      <td class="td-green">${n(c.basicStore)}</td>
+      <td class="td-orange">${n(c.feeBonsa)}</td>
+      <td class="td-orange">${n(c.feeStoreX)}</td>
+      <td class="td-orange">${n(c.feeStoreO)}</td>
+      <td class="td-orange">${n(c.feeTablet)}</td>
+      <td class="td-purple">${nz(exBonsa)}</td>
+      <td class="td-purple">${nz(exStoreX)}</td>
+      <td class="td-red">${n(costBonsa)}</td>
+      <td class="td-red">${n(costStoreX)}</td>
+      <td class="td-red">${n(costStoreO)}</td>
+      <td class="td-red">${n(costTablet)}</td>
+      <td class="td-teal">${nz(total)}</td>
+    </tr>`;
+  }).join("");
+}
+</script>
+</body>
+</html>
