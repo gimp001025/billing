@@ -220,6 +220,147 @@ table.srp tbody tr:hover { background:#f8faff; }
 
 ::-webkit-scrollbar { width:4px; height:4px; }
 ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
+
+/* ===== 사용료 내역 탭 ===== */
+.bh-wrap { padding:14px; }
+.bh-rangebar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; font-size:12px; }
+.bh-rangebar label { color:var(--muted); font-weight:600; }
+.bh-rangebar select { padding:5px 9px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text); outline:none; font-family:inherit; }
+.bh-rangebar select:focus { border-color:var(--primary); }
+.bh-note { font-size:11px; color:#94a3b8; }
+.bh-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+.bh-metric { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+.bh-metric-label { font-size:10px; color:var(--muted); margin-bottom:4px; font-weight:600; }
+.bh-metric-value { font-size:19px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.bh-metric.accent .bh-metric-value { color:var(--primary); }
+.bh-metric-sub { font-size:10px; color:#94a3b8; margin-top:3px; }
+.bh-sec { font-size:12px; font-weight:700; color:var(--muted); margin:16px 0 7px; }
+.bh-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; overflow-x:auto; }
+.bh-table { border-collapse:collapse; width:100%; font-size:12px; }
+.bh-table th, .bh-table td { border-bottom:1px solid #eef2f7; padding:8px 12px; text-align:center; white-space:nowrap; }
+.bh-table th { font-size:10px; font-weight:600; color:var(--muted); background:var(--surface2); }
+.bh-table td { color:var(--text); }
+.bh-table tbody tr:last-child td { border-bottom:none; }
+.bh-table tbody tr:hover td { background:#fafbff; }
+.bh-table .bh-total td { font-weight:700; background:var(--surface2) !important; }
+.bh-so { color:var(--green); font-weight:700; }
+.bh-sx { color:#94a3b8; }
+.bh-empty { padding:30px; text-align:center; color:#94a3b8; font-size:12px; }
+
+/* 입금현황 배지 */
+.pay-badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:10px; font-weight:700; white-space:nowrap; }
+.pay-badge.full { background:#d1fae5; color:#065f46; }
+.pay-badge.partial { background:#fef3c7; color:#92400e; }
+.pay-badge.none { background:#f1f5f9; color:#64748b; }
+.pay-badge.over { background:#fee2e2; color:#991b1b; }
+
+/* 발주서 대시보드 */
+.od-wrap { padding:18px 22px; overflow-y:auto; height:100%; }
+.od-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
+.od-title { font-size:18px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.od-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.od-search { padding:7px 11px; font-size:12px; border:1px solid var(--border); border-radius:7px; background:var(--surface); color:var(--text); outline:none; min-width:200px; font-family:inherit; }
+.od-search:focus { border-color:var(--primary); }
+.od-select { padding:7px 11px; font-size:12px; border:1px solid var(--border); border-radius:7px; background:var(--surface); color:var(--text); outline:none; font-family:inherit; }
+.od-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:16px; }
+.od-kpi { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; transition:box-shadow .15s; }
+.od-kpi:hover { box-shadow:0 2px 8px rgba(79,70,229,.08); }
+.od-kpi-label { font-size:11px; color:var(--muted); font-weight:600; margin-bottom:5px; }
+.od-kpi-value { font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.od-kpi-sub { font-size:10px; color:#94a3b8; margin-top:3px; }
+.od-kpi.unpaid .od-kpi-value { color:var(--yellow); }
+.od-kpi.unpaid.zero .od-kpi-value { color:var(--green); }
+.od-kpi.received .od-kpi-value { color:var(--primary); }
+
+/* 발주 내역 표 */
+.od-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.od-card-head { padding:10px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:700; color:var(--text); background:var(--surface2); display:flex; justify-content:space-between; align-items:center; }
+.od-table-wrap { overflow-x:auto; }
+.od-table { border-collapse:collapse; width:100%; font-size:12px; }
+.od-table th, .od-table td { border-bottom:1px solid #eef2f7; padding:10px 12px; text-align:center; white-space:nowrap; }
+.od-table th { font-size:10px; font-weight:600; color:var(--muted); background:var(--surface2); }
+.od-table tbody tr { cursor:pointer; transition:background .12s; }
+.od-table tbody tr:hover td { background:#f5f3ff; }
+.od-table tbody tr:last-child td { border-bottom:none; }
+.od-table .od-link { color:var(--primary); font-weight:600; text-decoration:underline; text-decoration-style:dotted; }
+.od-table .od-amt { text-align:right; font-variant-numeric:tabular-nums; }
+.od-empty { padding:42px; text-align:center; color:#94a3b8; font-size:12px; }
+
+/* 진행상태 배지 */
+.st-badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:10px; font-weight:700; white-space:nowrap; }
+.st-badge.draft   { background:#f1f5f9; color:#475569; }
+.st-badge.ongoing { background:#dbeafe; color:#1e40af; }
+.st-badge.done    { background:#d1fae5; color:#065f46; }
+.st-badge.hold    { background:#fee2e2; color:#991b1b; }
+
+/* 상세화면 뒤로가기 헤더 */
+.od-detail-head { display:flex; align-items:center; gap:10px; padding:0 0 12px; }
+.od-back-btn { display:flex; align-items:center; gap:5px; padding:6px 12px; font-size:12px; border:1px solid var(--border); border-radius:7px; background:var(--surface); color:var(--muted); cursor:pointer; font-family:inherit; transition:background .15s; }
+.od-back-btn:hover { background:var(--surface2); color:var(--text); }
+
+/* 기준일 라벨 */
+.od-date-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; font-size:11px; font-weight:600; border-radius:999px; background:var(--primary-light); color:var(--primary-dark); }
+
+/* 입금 진행바 (테이블 셀) */
+.od-pct-cell { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:90px; }
+.od-pct-num { font-size:12px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.od-pct-num.full { color:var(--green); }
+.od-pct-num.partial { color:#92400e; }
+.od-pct-num.none { color:#94a3b8; }
+.od-pct-num.over { color:var(--red); }
+.prog-bar { width:80px; height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden; }
+.prog-bar-fill { height:100%; transition:width .25s; }
+.prog-bar-fill.full { background:#10b981; }
+.prog-bar-fill.partial { background:#f59e0b; }
+.prog-bar-fill.none { background:#cbd5e1; }
+.prog-bar-fill.over { background:#ef4444; }
+
+/* 정렬 가능한 헤더 */
+.od-table th.sortable { cursor:pointer; user-select:none; transition:background .12s; position:relative; }
+.od-table th.sortable:hover { background:#e0e7ff; color:var(--primary); }
+.sort-ind { display:inline-block; margin-left:3px; font-size:9px; color:#cbd5e1; }
+.od-table th.sortable.active .sort-ind { color:var(--primary); }
+.od-table th.sortable.active { color:var(--primary); background:#eef2ff; }
+
+/* 연간 목표 섹션 */
+.goal-section { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+.goal-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.goal-title { font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:6px; }
+.goal-year-sel { padding:5px 9px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text); font-family:inherit; outline:none; }
+.goal-year-sel:focus { border-color:var(--primary); }
+.goal-target-box { display:flex; align-items:center; gap:6px; margin-left:auto; font-size:12px; color:var(--muted); }
+.goal-target-input { padding:5px 9px; font-size:12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text); text-align:right; outline:none; font-family:inherit; font-variant-numeric:tabular-nums; width:160px; }
+.goal-target-input:focus { border-color:var(--primary); }
+.goal-target-save { padding:5px 11px; font-size:11px; font-weight:600; border:1px solid var(--primary); border-radius:6px; background:var(--primary); color:#fff; cursor:pointer; font-family:inherit; }
+.goal-target-save:hover { background:var(--primary-dark); }
+.goal-summary { background:var(--surface2); border-radius:8px; padding:11px 14px; margin-bottom:14px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.goal-summary-main { font-size:13px; color:var(--text); }
+.goal-summary-amt { font-size:18px; font-weight:700; color:var(--primary); letter-spacing:-.01em; }
+.goal-summary-pct { font-size:14px; font-weight:700; padding:2px 9px; border-radius:999px; }
+.goal-summary-bar { flex:1; min-width:200px; height:10px; background:#e2e8f0; border-radius:5px; overflow:hidden; }
+.goal-summary-bar-fill { height:100%; background:linear-gradient(90deg, var(--primary) 0%, #6366f1 100%); transition:width .4s; }
+.goal-summary-sub { font-size:11px; color:var(--muted); }
+
+/* 월별 달성 그리드 */
+.goal-months-title { font-size:11px; font-weight:600; color:var(--muted); margin-bottom:8px; letter-spacing:.02em; }
+.goal-months { display:grid; grid-template-columns:repeat(12, 1fr); gap:5px; }
+.gm-col { display:flex; flex-direction:column; align-items:stretch; gap:4px; padding:7px 4px; border-radius:6px; transition:background .12s; cursor:default; }
+.gm-col:hover { background:var(--surface2); }
+.gm-label { font-size:10px; font-weight:600; color:var(--muted); text-align:center; }
+.gm-bar-wrap { height:60px; background:#f1f5f9; border-radius:4px; position:relative; overflow:hidden; display:flex; align-items:flex-end; }
+.gm-bar { width:100%; transition:height .35s; }
+.gm-bar.low    { background:#cbd5e1; }
+.gm-bar.med    { background:#fbbf24; }
+.gm-bar.good   { background:#60a5fa; }
+.gm-bar.full   { background:#10b981; }
+.gm-bar.over   { background:#059669; }
+.gm-target-line { position:absolute; left:0; right:0; border-top:1px dashed #94a3b8; pointer-events:none; }
+.gm-pct { font-size:10px; font-weight:700; text-align:center; line-height:1.1; }
+.gm-pct.low { color:#94a3b8; }
+.gm-pct.med { color:#92400e; }
+.gm-pct.good { color:#1e40af; }
+.gm-pct.full, .gm-pct.over { color:#065f46; }
+.gm-amt { font-size:9px; color:#94a3b8; text-align:center; line-height:1.2; font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
@@ -351,6 +492,7 @@ table.srp tbody tr:hover { background:#f8faff; }
           <div class="right-tab-bar">
             <button class="right-tab active" onclick="switchRightTab('info',this)">기본정보</button>
             <button class="right-tab" onclick="switchRightTab('fee',this)">사용료 입력</button>
+            <button class="right-tab" onclick="switchRightTab('history',this)">사용료 내역</button>
           </div>
 
           <!-- 기본정보 탭 -->
@@ -374,6 +516,26 @@ table.srp tbody tr:hover { background:#f8faff; }
             <div id="feeTabBar"></div>
             <div class="tab-panel active" id="tab-fee-body" style="display:block">
               <div class="fee-body" id="feeFormBody"></div>
+            </div>
+          </div>
+
+          <!-- 사용료 내역 탭 -->
+          <div class="tab-panel" id="tab-history">
+            <div class="bh-wrap">
+              <div class="bh-rangebar">
+                <label>조회 기간:</label>
+                <select id="bhFrom" onchange="renderHistory()"></select>
+                <span style="color:#94a3b8">~</span>
+                <select id="bhTo" onchange="renderHistory()"></select>
+                <span class="bh-note" id="bhRangeLabel"></span>
+              </div>
+              <div class="bh-metrics" id="bhMetrics"></div>
+              <div class="bh-sec">월별 유저 현황</div>
+              <div class="bh-card"><table class="bh-table" id="bhUserTable"></table></div>
+              <div class="bh-sec">월별 청구 합계</div>
+              <div class="bh-card"><table class="bh-table" id="bhBillTable"></table></div>
+              <div class="bh-sec">개발 내역 (추가 월사용료)</div>
+              <div class="bh-card"><table class="bh-table" id="bhDevTable"></table></div>
             </div>
           </div>
         </div>
@@ -438,33 +600,62 @@ table.srp tbody tr:hover { background:#f8faff; }
 
   <!-- ===== 발주서 ===== -->
   <div class="page" id="page-order">
-    <div class="unified-layout">
-      <!-- 왼쪽: 발주 목록 -->
-      <div class="cp-panel" style="width:260px">
-        <div class="cp-head">
-          <h3>발주서 목록</h3>
-          <input class="cp-search" type="text" placeholder="업체명 / 발주명 검색..." oninput="filterOrder(this.value)">
-          <div class="cp-actions" style="margin-top:6px">
-            <button class="btn btn-green" style="flex:1" onclick="openNewOrder()">+ 신규 발주서</button>
+    <!-- 대시보드 뷰 -->
+    <div id="orderDashboard" style="height:100%;display:flex;flex-direction:column">
+      <div class="od-wrap">
+        <div class="od-head">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div class="od-title">📋 발주서 관리</div>
+            <span class="od-date-chip" id="odDateChip">📅 기준일: -</span>
+          </div>
+          <div class="od-tools">
+            <input class="od-search" id="odSearch" type="text" placeholder="업체명 / 발주명 검색..." oninput="renderOrderDashboard()">
+            <select class="od-select" id="odStatusFilter" onchange="renderOrderDashboard()">
+              <option value="">전체 진행상태</option>
+              <option value="작성중">작성중</option>
+              <option value="진행중">진행중</option>
+              <option value="완료">완료</option>
+              <option value="보류">보류</option>
+            </select>
+            <select class="od-select" id="odPayFilter" onchange="renderOrderDashboard()">
+              <option value="">전체 입금상태</option>
+              <option value="none">미입금</option>
+              <option value="partial">부분입금</option>
+              <option value="full">완납</option>
+              <option value="over">초과입금</option>
+            </select>
+            <button class="btn btn-green" onclick="openNewOrder()">+ 신규 발주서</button>
           </div>
         </div>
-        <div class="cp-count" id="orderCount">0건</div>
-        <div class="cp-list" id="orderList"></div>
+        <div class="od-kpi-grid" id="odKpis"></div>
+        <div class="goal-section" id="goalSection"></div>
+        <div class="od-card">
+          <div class="od-card-head">
+            <span>발주 내역</span>
+            <span id="odListCount" style="font-size:11px;color:var(--muted);font-weight:500"></span>
+          </div>
+          <div class="od-table-wrap">
+            <table class="od-table" id="odTable"></table>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <!-- 오른쪽: 발주 상세 -->
-      <div class="right-panel">
-        <div class="right-empty" id="orderEmpty">
-          <div class="icon">📋</div>
-          <p>발주서를 선택하거나 새로 작성하세요</p>
-        </div>
-        <div class="right-content" id="orderContent">
-          <div class="right-toolbar">
-            <span class="right-company-name" id="orderTitle">-</span>
-            <div id="orderButtons"></div>
-          </div>
-          <div class="tab-panel active" style="display:block;overflow-y:auto">
-            <div class="form-body" id="orderFormBody"></div>
+    <!-- 상세 뷰 -->
+    <div id="orderDetailView" style="height:100%;display:none;flex-direction:column">
+      <div class="unified-layout" style="width:100%">
+        <div class="right-panel" style="flex:1">
+          <div class="right-content visible" id="orderContent" style="display:flex">
+            <div style="padding:14px 18px 0">
+              <button class="od-back-btn" onclick="showOrderDashboard()">← 목록으로</button>
+            </div>
+            <div class="right-toolbar">
+              <span class="right-company-name" id="orderTitle">-</span>
+              <div id="orderButtons"></div>
+            </div>
+            <div class="tab-panel active" style="display:block;overflow-y:auto">
+              <div class="form-body" id="orderFormBody"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -501,6 +692,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     document.getElementById('page-'+item.dataset.page).classList.add('active');
     document.getElementById('topTitle').textContent = pageTitles[item.dataset.page];
     if (item.dataset.page === 'stat') renderStat();
+    if (item.dataset.page === 'order') showOrderDashboard();
   });
 });
 
@@ -737,8 +929,128 @@ function readInfoForm() {
 function switchRightTab(tab, btn) {
   document.querySelectorAll('.right-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.tab-panel[id^="tab-"]').forEach(p => { if(p.id==='tab-info'||p.id==='tab-fee') p.classList.remove('active'); });
+  ['tab-info','tab-fee','tab-history'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('tab-'+tab).classList.add('active');
+  if (tab === 'history') renderHistory();
+}
+
+// ===== 사용료 내역 (상세 청구 내역) =====
+const BH_MONTHS = ["2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08","2026-09","2026-10","2026-11","2026-12"];
+function bhMl(m){ const p=m.split('-'); return p[0]+'년 '+(+p[1])+'월'; }
+function bhWon(n){ return (n||0).toLocaleString()+'원'; }
+const bhUserCache = {};
+function getBHUsers(c){
+  if(bhUserCache[c.id]) return bhUserCache[c.id];
+  const isUser = c.calcType==='유저수체크';
+  const monthlyUsers = {};
+  BH_MONTHS.forEach((m,i)=>{
+    monthlyUsers[m] = isUser
+      ? { bonsa:Math.min(10,8+Math.floor(i/3)), storeX:Math.min(5,3+Math.floor(i/3)), storeO:Math.min(6,4+Math.floor(i/3)), tablet:i<2?1:2 }
+      : { bonsa:0, storeX:0, storeO:0, tablet:0 };
+  });
+  bhUserCache[c.id] = monthlyUsers; return monthlyUsers;
+}
+function getBH(c){
+  const isUser = c.calcType==='유저수체크';
+  const addFee = { bonsa:+c.addHQFee||0, storeX:+c.addStoreFee||0, storeO:40000, tablet:90000 };
+  const monthlyUsers = getBHUsers(c);
+  // 해당 업체의 발주서 목록을 개발 내역으로 변환
+  const history = orders
+    .filter(o => o.companyId === c.id)
+    .map(o => ({
+      orderId: o.id,
+      date: o.date || '',
+      desc: o.orderName || '',
+      devAmt: +o.installFee || 0,
+      monthly: +o.monthlyFee || 0,
+      billingStart: o.billingStart || (o.date ? o.date.substring(0,7) : ''),
+      file: o.fileName || '',
+      issued: o.issued || 'X',
+      payments: o.payments || []
+    }))
+    .sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  return { type:c.calcType, erpBonsa:+c.hqUser||0, erpStore:+c.storeUser||0, addFee,
+           jeonsan:isUser?300000:0, fixedAmt:isUser?0:200000, monthlyUsers, history };
+}
+function bhMonthlyDevAt(d, ym){
+  // 해당월(YYYY-MM)의 개발 월사용료 합계 = billingStart <= ym 인 발주서들의 monthlyFee 합
+  return d.history.reduce((s,h)=>{
+    const start = h.billingStart || (h.date||'').substring(0,7);
+    return s + (start && ym >= start ? (h.monthly||0) : 0);
+  }, 0);
+}
+function bhCalcMonth(d,m){
+  const u = d.monthlyUsers[m] || {bonsa:0,storeX:0,storeO:0,tablet:0};
+  const monthlyDev = bhMonthlyDevAt(d, m);
+  if(d.type==='월정액'){ const base=d.fixedAmt||0; return {userExtra:base,jeonsan:d.jeonsan,monthly:monthlyDev,total:base+d.jeonsan+monthlyDev,u}; }
+  const diff = { bonsa:Math.max(0,u.bonsa-d.erpBonsa), storeX:Math.max(0,u.storeX-d.erpStore), storeO:Math.max(0,u.storeO), tablet:Math.max(0,u.tablet) };
+  const userExtra = diff.bonsa*d.addFee.bonsa + diff.storeX*d.addFee.storeX + diff.storeO*d.addFee.storeO + diff.tablet*d.addFee.tablet;
+  return {userExtra,jeonsan:d.jeonsan,monthly:monthlyDev,total:userExtra+d.jeonsan+monthlyDev,u};
+}
+function bhEnsureSelects(){
+  const f=document.getElementById('bhFrom'), t=document.getElementById('bhTo');
+  if(!f || f.options.length) return;
+  const opts = BH_MONTHS.map(m=>`<option value="${m}">${bhMl(m)}</option>`).join('');
+  f.innerHTML=opts; t.innerHTML=opts;
+  // 기본: 최근 12개월 윈도우 — 시작=오늘기준 11개월전, 종료=오늘기준 월
+  const now = new Date();
+  const curYM = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  let endIdx = BH_MONTHS.indexOf(curYM);
+  if(endIdx<0) endIdx = BH_MONTHS.length-1;
+  const startIdx = Math.max(0, endIdx-7);
+  f.value = BH_MONTHS[startIdx]; t.value = BH_MONTHS[endIdx];
+}
+function renderHistory(){
+  bhEnsureSelects();
+  const c = companies.find(x=>x.id===selectedId);
+  const mwrap = document.getElementById('bhMetrics');
+  const ut=document.getElementById('bhUserTable'), bt=document.getElementById('bhBillTable'), dt=document.getElementById('bhDevTable');
+  if(!c){
+    mwrap.innerHTML='<div class="bh-empty" style="grid-column:1/-1">업체를 선택하면 사용료 내역이 표시됩니다.</div>';
+    ut.innerHTML=''; bt.innerHTML=''; dt.innerHTML=''; document.getElementById('bhRangeLabel').textContent=''; return;
+  }
+  const d = getBH(c);
+  const from=document.getElementById('bhFrom').value, to=document.getElementById('bhTo').value;
+  const fi=BH_MONTHS.indexOf(from), ti=BH_MONTHS.indexOf(to);
+  if(fi<0||ti<0||fi>ti){ document.getElementById('bhRangeLabel').textContent='※ 시작월이 종료월보다 클 수 없습니다'; return; }
+  const range=BH_MONTHS.slice(fi,ti+1);
+  document.getElementById('bhRangeLabel').textContent='('+range.length+'개월)';
+  let totalAmt=0, totalMonthlyDev=0;
+  range.forEach(m=>{ const p=bhCalcMonth(d,m); totalAmt+=p.total; totalMonthlyDev+=p.monthly; });
+  const totalDev=d.history.reduce((s,h)=>s+(h.devAmt||0),0);
+  mwrap.innerHTML =
+    '<div class="bh-metric accent"><div class="bh-metric-label">기간 합계 청구금액</div><div class="bh-metric-value">'+bhWon(totalAmt)+'</div><div class="bh-metric-sub">'+range.length+'개월 합산</div></div>'+
+    '<div class="bh-metric"><div class="bh-metric-label">전산관리비 합계</div><div class="bh-metric-value">'+bhWon(d.jeonsan*range.length)+'</div></div>'+
+    '<div class="bh-metric"><div class="bh-metric-label">개발 월사용료 합계</div><div class="bh-metric-value">'+bhWon(totalMonthlyDev)+'</div><div class="bh-metric-sub">발행 시작월 이후만 합산</div></div>'+
+    '<div class="bh-metric"><div class="bh-metric-label">총 개발(설치)금액</div><div class="bh-metric-value">'+bhWon(totalDev)+'</div><div class="bh-metric-sub">부가세 별도</div></div>';
+  let uh='<thead><tr><th>월</th><th>본사</th><th>매장(결제X)</th><th>매장(결제O)</th><th>태블릿</th></tr></thead><tbody>';
+  range.forEach(m=>{ const u=d.monthlyUsers[m]||{bonsa:0,storeX:0,storeO:0,tablet:0}; uh+='<tr><td>'+bhMl(m)+'</td><td>'+u.bonsa+'</td><td>'+u.storeX+'</td><td>'+u.storeO+'</td><td>'+u.tablet+'</td></tr>'; });
+  ut.innerHTML=uh+'</tbody>';
+  let bh='<thead><tr><th>월</th><th>유저수 추가요금</th><th>전산관리비</th><th>개발 월사용료</th><th>월 합계</th></tr></thead><tbody>';
+  let grand=0;
+  range.forEach(m=>{ const p=bhCalcMonth(d,m); grand+=p.total; bh+='<tr><td>'+bhMl(m)+'</td><td>'+bhWon(p.userExtra)+'</td><td>'+bhWon(p.jeonsan)+'</td><td>'+bhWon(p.monthly)+'</td><td style="font-weight:700">'+bhWon(p.total)+'</td></tr>'; });
+  bh+='<tr class="bh-total"><td>합계 ('+range.length+'개월)</td><td colspan="3"></td><td>'+bhWon(grand)+'</td></tr></tbody>';
+  bt.innerHTML=bh;
+  let dh='<thead><tr><th>발주일</th><th>개발명</th><th>설치비</th><th>입금현황</th><th>월사용료</th><th>사용료 시작월</th><th>첨부파일</th><th>계산서</th></tr></thead><tbody>';
+  if(!d.history.length){ dh+='<tr><td colspan="8" class="bh-empty">발주서 등록 시 자동으로 표시됩니다.</td></tr>'; }
+  else {
+    dh+=d.history.map(h=>{
+      const st = derivePayStatus(h.devAmt, h.payments||[]);
+      return '<tr>'+
+        '<td>'+(h.date||'-')+'</td>'+
+        '<td style="font-weight:600">'+h.desc+'</td>'+
+        '<td style="text-align:right">'+(h.devAmt||0).toLocaleString()+'원</td>'+
+        '<td><span class="pay-badge '+st.cls+'">'+st.label+'</span></td>'+
+        '<td style="text-align:right">'+(h.monthly||0).toLocaleString()+'원</td>'+
+        '<td>'+(h.billingStart||'-')+'</td>'+
+        '<td style="color:var(--muted);font-size:11px">'+(h.file?'📎 '+h.file:'-')+'</td>'+
+        '<td class="'+(h.issued==='O'?'bh-so':'bh-sx')+'">'+h.issued+'</td>'+
+      '</tr>';
+    }).join('');
+    const totalMonthlyOnce = d.history.reduce((s,h)=>s+(h.monthly||0),0);
+    dh+='<tr class="bh-total"><td colspan="2">합계</td><td style="text-align:right">'+totalDev.toLocaleString()+'원</td><td></td><td style="text-align:right">'+totalMonthlyOnce.toLocaleString()+'원</td><td colspan="3"></td></tr>';
+  }
+  dt.innerHTML=dh+'</tbody>';
 }
 
 // ===== 사용료 탭 =====
@@ -1260,28 +1572,335 @@ function deleteQuote() {
 }
 
 // ===== 발주서 =====
-var orders=[], nextOrderId=1, selectedOrderId=null;
-function renderOrderList(keyword) {
-  keyword=keyword||'';
-  var list=orders.filter(function(o){ return o.companyName.includes(keyword)||o.orderName.includes(keyword); });
-  document.getElementById('orderCount').textContent=list.length+'건';
-  var el=document.getElementById('orderList');
-  if(!list.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:#94a3b8;font-size:11px">발주서가 없습니다</div>'; return; }
-  el.innerHTML=list.map(function(o){
-    return '<div class="cp-item '+(selectedOrderId===o.id?'selected':'')+'" onclick="selectOrder('+o.id+')">' +
-      '<div><div class="cp-name">'+o.companyName+'</div>' +
-      '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+o.orderName+' · '+o.date+'</div></div>' +
-      '<span class="badge '+(o.status==='완료'?'badge-ok':'badge-end')+'">'+o.status+'</span></div>';
-  }).join('');
+var orders=[
+  { id:1, companyId:1, companyName:'리아드', orderName:'CRM 프로그램 도입',
+    date:'2026-05-21', manager:'김세원', dueDate:'2026-06-30', status:'완료',
+    installFee:1500000, monthlyFee:50000, billingStart:'2026-06',
+    fileName:'개발_발주서_서명본.pdf',
+    payments:[
+      { date:'2026-05-25', amount:750000, type:'선금', invoiceDate:'2026-05-25', memo:'계약금 50%' },
+      { date:'2026-06-30', amount:750000, type:'잔금', invoiceDate:'2026-06-30', memo:'프로젝트 완료 후 잔금' }
+    ],
+    issued:'O',
+    items:[{name:'CRM 프로그램 설치비', qty:1, price:1500000}],
+    memo:'2026.06월부터 월 사용료 청구 시작 / 선금-잔금 50:50 분할' },
+  { id:2, companyId:2, companyName:'마티레', orderName:'재고관리 모듈 추가',
+    date:'2026-04-10', manager:'김세원', dueDate:'2026-05-20', status:'진행중',
+    installFee:2000000, monthlyFee:30000, billingStart:'2026-06',
+    fileName:'',
+    payments:[
+      { date:'2026-04-15', amount:1000000, type:'선금', invoiceDate:'2026-04-15', memo:'계약금 50%' }
+    ],
+    issued:'O',
+    items:[{name:'재고관리 모듈', qty:1, price:2000000}],
+    memo:'개발 진행중 (예상 완료: 5월 말)' },
+  { id:3, companyId:3, companyName:'툴앤코', orderName:'결제 시스템 연동',
+    date:'2026-05-02', manager:'김세원', dueDate:'2026-06-15', status:'진행중',
+    installFee:3000000, monthlyFee:0, billingStart:'',
+    fileName:'',
+    payments:[],
+    issued:'X',
+    items:[{name:'결제 시스템 연동 개발', qty:1, price:3000000}],
+    memo:'발주만 받고 입금 대기중' },
+  { id:4, companyId:4, companyName:'제이제이인터내셔날', orderName:'리포트 대시보드',
+    date:'2026-03-15', manager:'김세원', dueDate:'2026-04-30', status:'보류',
+    installFee:800000, monthlyFee:20000, billingStart:'2026-05',
+    fileName:'',
+    payments:[],
+    issued:'X',
+    items:[{name:'리포트 대시보드 개발', qty:1, price:800000}],
+    memo:'고객사 사정으로 일시 보류' }
+], nextOrderId=5, selectedOrderId=null;
+// ===== 발주서 대시보드/상세 뷰 전환 =====
+function showOrderDashboard(){
+  document.getElementById('orderDashboard').style.display='flex';
+  document.getElementById('orderDetailView').style.display='none';
+  selectedOrderId = null;
+  renderOrderDashboard();
 }
-function filterOrder(v){ renderOrderList(v); }
-function hideOrderContent(){ document.getElementById('orderEmpty').style.display=''; document.getElementById('orderContent').classList.remove('visible'); }
-function selectOrder(id){ selectedOrderId=id; renderOrderList(); showOrderDetail(); }
-function openNewOrder(){ selectedOrderId=null; renderOrderList(); showOrderFormNew(); }
+function showOrderDetailMode(){
+  document.getElementById('orderDashboard').style.display='none';
+  document.getElementById('orderDetailView').style.display='flex';
+}
+function selectOrder(id){
+  selectedOrderId = id;
+  showOrderDetailMode();
+  showOrderDetail();
+}
+function openNewOrder(){
+  selectedOrderId = null;
+  showOrderDetailMode();
+  showOrderFormNew();
+}
+// 발주서 status → 배지 클래스/라벨
+function odStatusBadge(status){
+  var map = { '작성중':'draft', '진행중':'ongoing', '완료':'done', '보류':'hold' };
+  var cls = map[status] || 'draft';
+  return '<span class="st-badge '+cls+'">'+(status||'작성중')+'</span>';
+}
+
+// ----- 연간 목표 저장 (localStorage) -----
+var TARGET_KEY = 'order_annual_targets_v1';
+function getAllTargets(){
+  try { return JSON.parse(localStorage.getItem(TARGET_KEY)||'{}') || {}; } catch(e){ return {}; }
+}
+function getAnnualTarget(year){
+  var data = getAllTargets();
+  if (data[year] != null) return +data[year];
+  // 기본값: 2026=636,000,000 (사용자 예시), 그 외 0
+  return year === 2026 ? 636000000 : 0;
+}
+function saveAnnualTarget(year, value){
+  var data = getAllTargets();
+  data[year] = +value || 0;
+  try { localStorage.setItem(TARGET_KEY, JSON.stringify(data)); } catch(e){}
+}
+
+// ----- 정렬 상태 -----
+var orderSort = { col:'date', dir:'desc' };
+function sortOrders(col){
+  if (orderSort.col === col) {
+    orderSort.dir = orderSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    orderSort.col = col;
+    // 텍스트류는 asc, 숫자/날짜류는 desc 기본
+    var ascDefault = ['companyName','orderName','status','issued'];
+    orderSort.dir = ascDefault.indexOf(col) >= 0 ? 'asc' : 'desc';
+  }
+  renderOrderDashboard();
+}
+function getOrderSortKey(o, col){
+  switch(col){
+    case 'date': return o.date || '';
+    case 'companyName': return (o.companyName||'').toLowerCase();
+    case 'orderName': return (o.orderName||'').toLowerCase();
+    case 'install': return +o.installFee||0;
+    case 'paid': return (o.payments||[]).reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+    case 'unpaid': return (+o.installFee||0) - (o.payments||[]).reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+    case 'pct': {
+      var inst = +o.installFee||0;
+      var paid = (o.payments||[]).reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+      return inst>0 ? (paid/inst)*100 : (paid>0 ? 1e9 : -1);
+    }
+    case 'status': {
+      var order = { '작성중':1, '진행중':2, '완료':3, '보류':4 };
+      return order[o.status] || 99;
+    }
+    case 'issued': return o.issued || 'X';
+    default: return '';
+  }
+}
+
+// ----- 기준일 -----
+function fmtKoDate(d){
+  var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  var w = ['일','월','화','수','목','금','토'][d.getDay()];
+  return y+'.'+m+'.'+dd+' ('+w+')';
+}
+
+function renderOrderDashboard(){
+  // 기준일
+  var nowD = new Date();
+  var dc = document.getElementById('odDateChip');
+  if (dc) dc.innerHTML = '📅 기준일: '+fmtKoDate(nowD);
+
+  var kw = (document.getElementById('odSearch')||{}).value || '';
+  var stf = (document.getElementById('odStatusFilter')||{}).value || '';
+  var pyf = (document.getElementById('odPayFilter')||{}).value || '';
+  kw = kw.trim().toLowerCase();
+
+  // KPI는 필터 적용 전 기준
+  var totalCount = orders.length;
+  var totalInstall = orders.reduce(function(s,o){ return s+(+o.installFee||0); }, 0);
+  var totalPaid = orders.reduce(function(s,o){
+    return s + (o.payments||[]).reduce(function(ss,p){ return ss+(+p.amount||0); }, 0);
+  }, 0);
+  var totalUnpaid = Math.max(0, totalInstall - totalPaid);
+  var ongoingCount = orders.filter(function(o){ return o.status==='진행중'; }).length;
+  var doneCount = orders.filter(function(o){ return o.status==='완료'; }).length;
+  document.getElementById('odKpis').innerHTML =
+    '<div class="od-kpi"><div class="od-kpi-label">총 발주 건수</div><div class="od-kpi-value">'+totalCount+'건</div><div class="od-kpi-sub">진행중 '+ongoingCount+' · 완료 '+doneCount+'</div></div>' +
+    '<div class="od-kpi"><div class="od-kpi-label">총 발주금액 (설치비)</div><div class="od-kpi-value">'+totalInstall.toLocaleString()+'원</div><div class="od-kpi-sub">부가세 별도</div></div>' +
+    '<div class="od-kpi received"><div class="od-kpi-label">총 입금액</div><div class="od-kpi-value">'+totalPaid.toLocaleString()+'원</div><div class="od-kpi-sub">'+(totalInstall?Math.round(totalPaid/totalInstall*100):0)+'% 회수</div></div>' +
+    '<div class="od-kpi unpaid '+(totalUnpaid===0?'zero':'')+'"><div class="od-kpi-label">남은 미수금</div><div class="od-kpi-value">'+totalUnpaid.toLocaleString()+'원</div><div class="od-kpi-sub">'+(totalUnpaid===0?'✅ 모두 완납':'회수 필요')+'</div></div>';
+
+  // 연간 목표 섹션
+  renderGoalSection();
+
+  // 필터 적용 목록
+  var list = orders.filter(function(o){
+    if (kw){
+      var s = ((o.companyName||'')+' '+(o.orderName||'')+' '+(o.manager||'')).toLowerCase();
+      if (!s.includes(kw)) return false;
+    }
+    if (stf && (o.status||'')!==stf) return false;
+    if (pyf){
+      var st = derivePayStatus(+o.installFee||0, o.payments||[]);
+      if (st.cls !== pyf) return false;
+    }
+    return true;
+  });
+  // 정렬
+  list.sort(function(a,b){
+    var av = getOrderSortKey(a, orderSort.col);
+    var bv = getOrderSortKey(b, orderSort.col);
+    if (av < bv) return orderSort.dir==='asc' ? -1 : 1;
+    if (av > bv) return orderSort.dir==='asc' ? 1 : -1;
+    return 0;
+  });
+
+  document.getElementById('odListCount').textContent = list.length + '건';
+  var tb = document.getElementById('odTable');
+
+  // 헤더(정렬 가능)
+  var cols = [
+    {key:'date',         label:'발주일'},
+    {key:'companyName',  label:'업체명'},
+    {key:'orderName',    label:'발주명'},
+    {key:'install',      label:'설치비'},
+    {key:'paid',         label:'입금액'},
+    {key:'unpaid',       label:'미수금'},
+    {key:'pct',          label:'입금률'},
+    {key:'status',       label:'진행상태'},
+    {key:'issued',       label:'계산서'}
+  ];
+  var headHtml = '<thead><tr>' + cols.map(function(c){
+    var active = orderSort.col===c.key;
+    var arrow = active ? (orderSort.dir==='asc' ? '▲' : '▼') : '↕';
+    return '<th class="sortable'+(active?' active':'')+'" onclick="sortOrders(\''+c.key+'\')">'+c.label+' <span class="sort-ind">'+arrow+'</span></th>';
+  }).join('') + '</tr></thead>';
+
+  if (!list.length){
+    tb.innerHTML = headHtml + '<tbody><tr><td colspan="9"><div class="od-empty">조건에 해당하는 발주서가 없습니다.</div></td></tr></tbody>';
+    return;
+  }
+  var body = '<tbody>'+list.map(function(o){
+    var install = +o.installFee||0;
+    var paid = (o.payments||[]).reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+    var unpaid = install - paid;
+    var st = derivePayStatus(install, o.payments||[]);
+    var pct = install>0 ? (paid/install*100) : 0;
+    var pctNum = install>0 ? (Math.round(pct*10)/10) : (paid>0 ? null : 0);
+    var unpaidHtml = unpaid > 0
+      ? '<span style="color:var(--yellow);font-weight:700">'+unpaid.toLocaleString()+'원</span>'
+      : (unpaid < 0
+          ? '<span style="color:var(--red);font-weight:700">'+unpaid.toLocaleString()+'원</span>'
+          : '<span style="color:var(--green);font-weight:700">0원</span>');
+    var pctLabel = pctNum===null ? '−' : (pctNum+'%');
+    var pctCls = st.cls;
+    var barWidth = Math.min(100, Math.max(0, pct));
+    return '<tr onclick="selectOrder('+o.id+')">' +
+      '<td>'+(o.date||'-')+'</td>' +
+      '<td>'+(o.companyName||'-')+'</td>' +
+      '<td class="od-link">'+o.orderName+'</td>' +
+      '<td class="od-amt">'+install.toLocaleString()+'원</td>' +
+      '<td class="od-amt">'+paid.toLocaleString()+'원</td>' +
+      '<td class="od-amt">'+unpaidHtml+'</td>' +
+      '<td><div class="od-pct-cell">' +
+        '<div class="od-pct-num '+pctCls+'">'+pctLabel+'</div>' +
+        '<div class="prog-bar"><div class="prog-bar-fill '+pctCls+'" style="width:'+barWidth+'%"></div></div>' +
+      '</div></td>' +
+      '<td>'+odStatusBadge(o.status)+'</td>' +
+      '<td class="'+((o.issued||'X')==='O'?'bh-so':'bh-sx')+'">'+(o.issued||'X')+'</td>' +
+    '</tr>';
+  }).join('')+'</tbody>';
+  tb.innerHTML = headHtml + body;
+}
+
+// ===== 연간 목표 섹션 렌더 =====
+var goalCurrentYear = (new Date()).getFullYear();
+function renderGoalSection(){
+  var el = document.getElementById('goalSection'); if(!el) return;
+  var year = goalCurrentYear;
+  var target = getAnnualTarget(year);
+  var monthlyTarget = target ? Math.round(target/12) : 0;
+
+  // 해당 연도 월별 발주 합계
+  var monthly = new Array(12).fill(0);
+  orders.forEach(function(o){
+    if (!o.date) return;
+    var p = o.date.split('-');
+    if (+p[0] !== year) return;
+    var mi = (+p[1]) - 1;
+    if (mi>=0 && mi<12) monthly[mi] += (+o.installFee||0);
+  });
+  var ytdActual = monthly.reduce(function(s,v){ return s+v; }, 0);
+  var ytdPct = target ? (ytdActual/target*100) : 0;
+  var ytdPctR = Math.round(ytdPct*10)/10;
+
+  var ytdPctCls = ytdPct >= 100 ? 'full' : (ytdPct >= 50 ? 'good' : (ytdPct >= 10 ? 'med' : 'low'));
+  var ytdPctColor = { full:'#10b981', good:'#3b82f6', med:'#f59e0b', low:'#94a3b8' }[ytdPctCls];
+
+  // 연도 옵션
+  var thisYear = (new Date()).getFullYear();
+  var yearOpts = '';
+  for (var y=thisYear-2; y<=thisYear+2; y++){
+    yearOpts += '<option value="'+y+'" '+(y===year?'selected':'')+'>'+y+'년</option>';
+  }
+
+  // 월별 막대
+  var monthsHtml = '';
+  var todayMonthIdx = (new Date()).getMonth();
+  for (var i=0;i<12;i++){
+    var amt = monthly[i];
+    var pct = monthlyTarget ? (amt/monthlyTarget*100) : 0;
+    var pctR = Math.round(pct*10)/10;
+    var barCls = pct >= 100 ? (pct >= 150 ? 'over':'full') : (pct >= 70 ? 'good' : (pct >= 30 ? 'med' : 'low'));
+    var barH = Math.min(100, Math.max(0, pct));
+    var isCurrentMonth = (year===thisYear && i===todayMonthIdx);
+    monthsHtml +=
+      '<div class="gm-col" style="'+(isCurrentMonth?'background:#eef2ff;':'')+'">' +
+        '<div class="gm-label">'+(i+1)+'월</div>' +
+        '<div class="gm-bar-wrap">' +
+          (monthlyTarget?'<div class="gm-target-line" style="bottom:100%"></div>':'') +
+          '<div class="gm-bar '+barCls+'" style="height:'+barH+'%"></div>' +
+        '</div>' +
+        '<div class="gm-pct '+barCls+'">'+(monthlyTarget?(pctR+'%'):'-')+'</div>' +
+        '<div class="gm-amt">'+(amt?(amt>=10000000?(Math.round(amt/1000000)+'M'):(Math.round(amt/10000)+'만')):'0')+'</div>' +
+      '</div>';
+  }
+
+  el.innerHTML =
+    '<div class="goal-head">' +
+      '<div class="goal-title">🎯 연간 목표 달성 현황</div>' +
+      '<select class="goal-year-sel" id="goalYearSel" onchange="onGoalYearChange(this.value)">'+yearOpts+'</select>' +
+      '<div class="goal-target-box">' +
+        '<span>연간 목표</span>' +
+        '<input type="text" class="goal-target-input" id="goalTargetInput" value="'+target.toLocaleString()+'" inputmode="numeric" oninput="onGoalTargetInput(this)">' +
+        '<span>원</span>' +
+        '<button class="goal-target-save" onclick="saveGoalTarget()">💾 저장</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="goal-summary">' +
+      '<div class="goal-summary-main">연 누계 실적 <span class="goal-summary-amt">'+ytdActual.toLocaleString()+'원</span>' +
+        (target?' / '+target.toLocaleString()+'원':'') +
+      '</div>' +
+      '<div class="goal-summary-bar"><div class="goal-summary-bar-fill" style="width:'+Math.min(100,ytdPct)+'%;background:'+ytdPctColor+'"></div></div>' +
+      '<div class="goal-summary-pct" style="background:'+ytdPctColor+'1f;color:'+ytdPctColor+'">'+(target?ytdPctR+'%':'목표 미설정')+'</div>' +
+      (target?'<div class="goal-summary-sub">월 평균 목표 '+monthlyTarget.toLocaleString()+'원</div>':'') +
+    '</div>' +
+    '<div class="goal-months-title">월별 달성률 (목표 대비)</div>' +
+    '<div class="goal-months">'+monthsHtml+'</div>';
+}
+function onGoalYearChange(y){
+  goalCurrentYear = +y;
+  renderGoalSection();
+}
+function onGoalTargetInput(inp){
+  // 숫자만 추출 후 콤마 포맷 유지
+  var raw = (inp.value||'').replace(/[^0-9]/g,'');
+  var n = +raw || 0;
+  inp.value = n.toLocaleString();
+}
+function saveGoalTarget(){
+  var inp = document.getElementById('goalTargetInput');
+  var raw = (inp.value||'').replace(/[^0-9]/g,'');
+  var n = +raw || 0;
+  saveAnnualTarget(goalCurrentYear, n);
+  renderGoalSection();
+}
 function showOrderDetail() {
   var o=orders.find(function(x){ return x.id===selectedOrderId; });
-  document.getElementById('orderEmpty').style.display='none';
-  document.getElementById('orderContent').classList.add('visible');
   document.getElementById('orderTitle').textContent=o.companyName+' · '+o.orderName;
   document.getElementById('orderButtons').innerHTML='<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="editOrder()">✏️ 수정</button><button class="btn btn-red" onclick="deleteOrder()">🗑️ 삭제</button></div>';
   var total=(o.items||[]).reduce(function(s,it){ return s+(+it.qty||0)*(+it.price||0); },0);
@@ -1290,13 +1909,50 @@ function showOrderDetail() {
   }).join('');
   document.getElementById('orderFormBody').innerHTML=
     '<div class="form-section"><div class="form-section-title fst-basic">📋 기본정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
-    '<div class="form-field"><label>발주 업체명</label><input class="f-input" value="'+o.companyName+'" readonly></div>' +
+    '<div class="form-field"><label>발주 업체명</label><input class="f-input" value="'+(o.companyName||'')+'" readonly></div>' +
     '<div class="form-field"><label>발주명</label><input class="f-input" value="'+o.orderName+'" readonly></div>' +
-    '<div class="form-field"><label>날짜</label><input class="f-input" value="'+o.date+'" readonly></div>' +
+    '<div class="form-field"><label>발주일</label><input class="f-input" value="'+(o.date||'')+'" readonly></div>' +
     '<div class="form-field"><label>담당자</label><input class="f-input" value="'+(o.manager||'')+'" readonly></div>' +
     '<div class="form-field"><label>납기일</label><input class="f-input" value="'+(o.dueDate||'')+'" readonly></div>' +
     '<div class="form-field"><label>상태</label><input class="f-input" value="'+o.status+'" readonly></div>' +
     '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-fee">💼 개발 사용료 정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
+    '<div class="form-field"><label>설치비</label><input class="f-input" value="'+((+o.installFee||0).toLocaleString())+'원" readonly style="text-align:right"></div>' +
+    '<div class="form-field"><label>월 사용료</label><input class="f-input" value="'+((+o.monthlyFee||0).toLocaleString())+'원" readonly style="text-align:right"></div>' +
+    '<div class="form-field"><label>사용료 발행 시작월</label><input class="f-input" value="'+(o.billingStart||'-')+'" readonly></div>' +
+    '<div class="form-field" style="grid-column:span 3"><label>첨부파일</label><input class="f-input" value="'+(o.fileName?'📎 '+o.fileName:'(없음)')+'" readonly></div>' +
+    '</div></div></div>' +
+    (function(){
+      var pays = o.payments || [];
+      var payTotal = pays.reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+      var st = derivePayStatus(+o.installFee||0, pays);
+      var statusHtml = '<span class="pay-badge '+st.cls+'">'+st.label+'</span>';
+      var rowsHtml = pays.length
+        ? pays.map(function(p){
+            return '<tr>'+
+              '<td>'+(p.date||'-')+'</td>'+
+              '<td style="text-align:right">'+((+p.amount||0).toLocaleString())+'원</td>'+
+              '<td>'+(p.type||'-')+'</td>'+
+              '<td>'+(p.invoiceDate||'<span style="color:#94a3b8">미발행</span>')+'</td>'+
+              '<td style="text-align:left;color:var(--muted)">'+(p.memo||'')+'</td>'+
+            '</tr>';
+          }).join('')
+        : '<tr><td colspan="5" style="padding:18px;color:#94a3b8">입금 내역 없음</td></tr>';
+      return '<div class="form-section"><div class="form-section-title fst-fee">💰 입금 / 계산서 내역</div>' +
+        '<div class="form-section-body" style="padding:0">' +
+        '<table style="width:100%;border-collapse:collapse;font-size:11px;text-align:center"><thead><tr style="background:#f8fafc">' +
+        '<th style="padding:7px;border-bottom:1px solid var(--border)">입금일</th>' +
+        '<th style="padding:7px;border-bottom:1px solid var(--border)">입금액</th>' +
+        '<th style="padding:7px;border-bottom:1px solid var(--border)">구분</th>' +
+        '<th style="padding:7px;border-bottom:1px solid var(--border)">계산서 발행일</th>' +
+        '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">메모</th>' +
+        '</tr></thead><tbody>'+rowsHtml+'</tbody>' +
+        '<tfoot><tr style="background:var(--primary-light)">' +
+        '<td style="padding:8px 10px;font-weight:700;color:var(--primary-dark)">합계</td>' +
+        '<td style="padding:8px 10px;font-weight:700;color:var(--primary);text-align:right">'+payTotal.toLocaleString()+'원</td>' +
+        '<td colspan="3" style="padding:8px 10px;text-align:right">'+statusHtml+'</td>' +
+        '</tr></tfoot></table></div></div>';
+    })() +
     '<div class="form-section"><div class="form-section-title fst-info">📦 발주 항목</div><div class="form-section-body" style="padding:0">' +
     '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
     '<th style="padding:7px;border-bottom:1px solid var(--border);width:36px">No</th>' +
@@ -1311,12 +1967,10 @@ function showOrderDetail() {
     (o.memo?'<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div><div class="form-section-body"><p style="font-size:11px;white-space:pre-wrap">'+o.memo+'</p></div></div>':'');
 }
 function showOrderFormNew(o) {
-  document.getElementById('orderEmpty').style.display='none';
-  document.getElementById('orderContent').classList.add('visible');
-  document.getElementById('orderTitle').textContent= o ? o.companyName+' · '+o.orderName+' 수정' : '신규 발주서 작성';
+  document.getElementById('orderTitle').textContent= o ? (o.companyName||'')+' · '+o.orderName+' 수정' : '신규 발주서 작성';
   document.getElementById('orderButtons').innerHTML= o
     ? '<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="updateOrder()">💾 저장</button><button class="btn btn-outline" onclick="selectOrder('+selectedOrderId+')">취소</button></div>'
-    : '<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="saveOrder()">💾 저장</button><button class="btn btn-outline" onclick="hideOrderContent()">취소</button></div>';
+    : '<div style="display:flex;gap:6px"><button class="btn btn-primary" onclick="saveOrder()">💾 저장</button><button class="btn btn-outline" onclick="showOrderDashboard()">취소</button></div>';
   var itemRows=(o?o.items:[{name:'',qty:1,price:0}]).map(function(it,i){
     return '<tr id="orow_'+i+'"><td style="text-align:center;padding:4px">'+(i+1)+'</td>' +
       '<td style="padding:4px"><input class="f-input" style="width:100%" id="oi_name_'+i+'" value="'+it.name+'" placeholder="항목명"></td>' +
@@ -1325,15 +1979,51 @@ function showOrderFormNew(o) {
       '<td style="padding:4px;text-align:right;font-weight:600" id="oi_amt_'+i+'">'+((+it.qty||1)*(+it.price||0)).toLocaleString()+'</td>' +
       '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removeOrderRow('+i+')">✕</button></td></tr>';
   }).join('');
+  var companyOpts = companies.map(function(c){
+    var sel = (o && o.companyId===c.id) ? 'selected' : '';
+    return '<option value="'+c.id+'" '+sel+'>'+c.name+'</option>';
+  }).join('');
+  var todayStr = today.toISOString().split('T')[0];
+  // 사용료 발행 시작월 기본: 발주일의 다음 달
+  function nextMonthOf(dateStr){
+    if(!dateStr) return '';
+    var p=dateStr.split('-'); var y=+p[0], m=+p[1];
+    m+=1; if(m>12){ m=1; y+=1; }
+    return y+'-'+String(m).padStart(2,'0');
+  }
+  var defaultBillingStart = o ? (o.billingStart||'') : nextMonthOf(todayStr);
   document.getElementById('orderFormBody').innerHTML=
     '<div class="form-section"><div class="form-section-title fst-basic">📋 기본정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
-    '<div class="form-field"><label>발주 업체명 *</label><input class="f-input" id="o_company" value="'+(o?o.companyName:'')+'" placeholder="업체명"></div>' +
-    '<div class="form-field"><label>발주명 *</label><input class="f-input" id="o_name" value="'+(o?o.orderName:'')+'" placeholder="발주명"></div>' +
-    '<div class="form-field"><label>날짜</label><input class="f-input" id="o_date" type="date" value="'+(o?o.date:today.toISOString().split("T")[0])+'"></div>' +
+    '<div class="form-field"><label>발주 업체명 *</label><select class="f-select" id="o_companyId"><option value="">-- 업체 선택 --</option>'+companyOpts+'</select></div>' +
+    '<div class="form-field"><label>발주명 *</label><input class="f-input" id="o_name" value="'+(o?o.orderName:'')+'" placeholder="예: CRM 프로그램 도입"></div>' +
+    '<div class="form-field"><label>발주일</label><input class="f-input" id="o_date" type="date" value="'+(o?o.date:todayStr)+'"></div>' +
     '<div class="form-field"><label>담당자</label><input class="f-input" id="o_manager" value="'+(o?o.manager||'':'')+'" placeholder="담당자명"></div>' +
     '<div class="form-field"><label>납기일</label><input class="f-input" id="o_dueDate" type="date" value="'+(o?o.dueDate||'':'')+'" ></div>' +
-    '<div class="form-field"><label>상태</label><select class="f-select" id="o_status"><option '+((!o||o.status==='작성중')?'selected':'')+'>작성중</option><option '+(o&&o.status==='완료'?'selected':'')+'>완료</option></select></div>' +
+    '<div class="form-field"><label>진행상태</label><select class="f-select" id="o_status">' +
+      ['작성중','진행중','완료','보류'].map(function(s){
+        return '<option '+(((!o&&s==='작성중')||(o&&o.status===s))?'selected':'')+'>'+s+'</option>';
+      }).join('') +
+    '</select></div>' +
     '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-fee">💼 개발 사용료 정보</div><div class="form-section-body"><div class="form-grid fg-3">' +
+    '<div class="form-field"><label>설치비 (원)</label><input class="f-input" id="o_installFee" type="number" value="'+(o?o.installFee||0:0)+'" style="text-align:right" placeholder="1500000" oninput="calcPaymentSummary()"></div>' +
+    '<div class="form-field"><label>월 사용료 (원)</label><input class="f-input" id="o_monthlyFee" type="number" value="'+(o?o.monthlyFee||0:0)+'" style="text-align:right" placeholder="50000"></div>' +
+    '<div class="form-field"><label>사용료 발행 시작월</label><input class="f-input" id="o_billingStart" type="month" value="'+defaultBillingStart+'"></div>' +
+    '<div class="form-field" style="grid-column:span 3"><label>첨부파일 (발주서 서명본 등)</label><input class="f-input" type="file" id="o_file" onchange="onOrderFileChange(this)"><input type="hidden" id="o_fileName" value="'+(o?o.fileName||'':'')+'"><div id="o_fileNameLabel" style="font-size:11px;color:var(--muted);margin-top:4px">'+(o&&o.fileName?'📎 '+o.fileName:'(선택 없음)')+'</div></div>' +
+    '</div></div></div>' +
+    '<div class="form-section"><div class="form-section-title fst-fee" style="display:flex;align-items:center;justify-content:space-between">' +
+    '<span>💰 입금 / 계산서 내역</span><button class="btn btn-outline" style="font-size:10px;padding:3px 8px" onclick="addPaymentRow()">+ 입금 추가</button></div>' +
+    '<div class="form-section-body" style="padding:0">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f8fafc">' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:120px">입금일</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:120px">입금액(원)</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:90px">구분</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:130px">계산서 발행일</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);text-align:left">메모</th>' +
+    '<th style="padding:7px;border-bottom:1px solid var(--border);width:40px"></th>' +
+    '</tr></thead><tbody id="paymentBody">'+buildPaymentRows(o?o.payments:[])+'</tbody>' +
+    '<tfoot><tr style="background:var(--primary-light)"><td colspan="6" style="padding:8px 10px;font-size:11px" id="paymentSummary"></td></tr></tfoot>' +
+    '</table></div></div>' +
     '<div class="form-section"><div class="form-section-title fst-info" style="display:flex;align-items:center;justify-content:space-between">' +
     '<span>📦 발주 항목</span><button class="btn btn-outline" style="font-size:10px;padding:3px 8px" onclick="addOrderRow()">+ 항목 추가</button></div>' +
     '<div class="form-section-body" style="padding:0">' +
@@ -1351,6 +2041,87 @@ function showOrderFormNew(o) {
     '<div class="form-section"><div class="form-section-title fst-fee">📝 메모</div>' +
     '<div class="form-section-body"><textarea class="f-textarea" id="o_memo" rows="3" style="width:100%" placeholder="메모 입력">'+(o?o.memo||'':'')+'</textarea></div></div>';
   calcOrderTotal();
+  calcPaymentSummary();
+}
+function onOrderFileChange(inp){
+  var name = inp && inp.files && inp.files[0] ? inp.files[0].name : '';
+  document.getElementById('o_fileName').value = name;
+  document.getElementById('o_fileNameLabel').textContent = name ? '📎 '+name : '(선택 없음)';
+}
+
+// ===== 입금/계산서 내역 =====
+function paymentRowHtml(p){
+  p = p || {};
+  var types = ['전액','선금','중도금','잔금','기타'];
+  var typeOpts = types.map(function(t){ return '<option '+((p.type||'전액')===t?'selected':'')+'>'+t+'</option>'; }).join('');
+  return '<tr class="pay-row">' +
+    '<td style="padding:4px"><input type="date" class="f-input pay-date" style="width:100%" value="'+(p.date||'')+'"></td>' +
+    '<td style="padding:4px"><input type="number" class="f-input pay-amount" style="width:100%;text-align:right" value="'+(p.amount||0)+'" oninput="calcPaymentSummary()" placeholder="0"></td>' +
+    '<td style="padding:4px"><select class="f-select pay-type" style="width:100%">'+typeOpts+'</select></td>' +
+    '<td style="padding:4px"><input type="date" class="f-input pay-invoice" style="width:100%" value="'+(p.invoiceDate||'')+'"></td>' +
+    '<td style="padding:4px"><input class="f-input pay-memo" style="width:100%" value="'+(p.memo||'').replace(/"/g,'&quot;')+'" placeholder="(선택)"></td>' +
+    '<td style="padding:4px;text-align:center"><button class="btn btn-red" style="padding:2px 6px" onclick="removePaymentRow(this)">✕</button></td>' +
+  '</tr>';
+}
+function buildPaymentRows(payments){
+  var arr = (payments && payments.length) ? payments : [{}];
+  return arr.map(paymentRowHtml).join('');
+}
+function addPaymentRow(){
+  var tbody = document.getElementById('paymentBody');
+  tbody.insertAdjacentHTML('beforeend', paymentRowHtml({}));
+  calcPaymentSummary();
+}
+function removePaymentRow(btn){
+  var tr = btn.closest('tr'); if(tr) tr.remove();
+  calcPaymentSummary();
+}
+function readPayments(){
+  return Array.prototype.slice.call(document.querySelectorAll('#paymentBody .pay-row')).map(function(tr){
+    return {
+      date: tr.querySelector('.pay-date').value,
+      amount: +tr.querySelector('.pay-amount').value || 0,
+      type: tr.querySelector('.pay-type').value || '전액',
+      invoiceDate: tr.querySelector('.pay-invoice').value,
+      memo: tr.querySelector('.pay-memo').value
+    };
+  }).filter(function(p){ return p.amount>0 || p.date || p.invoiceDate || p.memo; });
+}
+function calcPaymentSummary(){
+  var rows = document.querySelectorAll('#paymentBody .pay-row');
+  var total = 0;
+  rows.forEach(function(tr){ total += +tr.querySelector('.pay-amount').value || 0; });
+  var installFee = +(document.getElementById('o_installFee')||{}).value || 0;
+  var el = document.getElementById('paymentSummary'); if(!el) return;
+  var remain = installFee - total;
+  var statusHtml;
+  if (installFee === 0 && total === 0) {
+    statusHtml = '<span style="color:#94a3b8">설치비를 먼저 입력하세요</span>';
+  } else if (installFee === 0) {
+    statusHtml = '<span style="color:var(--yellow);font-weight:700">⚠ 설치비 미입력 (입금만 '+total.toLocaleString()+'원)</span>';
+  } else if (remain === 0) {
+    statusHtml = '<span style="color:var(--green);font-weight:700">✅ 완납</span>';
+  } else if (remain > 0) {
+    statusHtml = '<span style="color:var(--yellow);font-weight:700">잔액 '+remain.toLocaleString()+'원</span>';
+  } else {
+    statusHtml = '<span style="color:var(--red);font-weight:700">⚠ 초과입금 '+Math.abs(remain).toLocaleString()+'원</span>';
+  }
+  el.innerHTML = '설치비 <b>'+installFee.toLocaleString()+'원</b>  /  입금합계 <b style="color:var(--primary)">'+total.toLocaleString()+'원</b>  ·  '+statusHtml;
+}
+// 발행여부 자동 도출: 결제 중 계산서 발행일이 하나라도 있으면 'O'
+function deriveIssued(payments){
+  if(!payments || !payments.length) return 'X';
+  return payments.some(function(p){ return p.invoiceDate; }) ? 'O' : 'X';
+}
+// 입금현황 자동 도출
+function derivePayStatus(installFee, payments){
+  var total = (payments||[]).reduce(function(s,p){ return s+(+p.amount||0); }, 0);
+  if (!installFee) return { label:total>0?total.toLocaleString()+'원 입금':'-', cls:'none', total:total, remain:0 };
+  var remain = installFee - total;
+  if (remain === 0) return { label:'완납', cls:'full', total:total, remain:0 };
+  if (total === 0) return { label:'미입금', cls:'none', total:0, remain:installFee };
+  if (remain > 0) return { label:total.toLocaleString()+'원 / '+installFee.toLocaleString()+'원', cls:'partial', total:total, remain:remain };
+  return { label:'초과 '+Math.abs(remain).toLocaleString()+'원', cls:'over', total:total, remain:remain };
 }
 function editOrder(){ var o=orders.find(function(x){ return x.id===selectedOrderId; }); showOrderFormNew(o); }
 function addOrderRow(){
@@ -1384,24 +2155,47 @@ function readOrderItems(){
   });
 }
 function saveOrder(){
-  if(!val('o_company')||!val('o_name')){ alert('업체명과 발주명을 입력하세요.'); return; }
-  var o={id:nextOrderId++,companyName:val('o_company'),orderName:val('o_name'),date:val('o_date'),manager:val('o_manager'),dueDate:val('o_dueDate'),status:val('o_status'),memo:val('o_memo'),items:readOrderItems()};
-  orders.push(o); selectedOrderId=o.id; renderOrderList(); showOrderDetail();
+  var cid = +val('o_companyId')||null;
+  var cName = cid ? (companies.find(function(c){return c.id===cid;})||{}).name||'' : '';
+  if(!cid||!val('o_name')){ alert('발주 업체와 발주명을 입력하세요.'); return; }
+  var payments = readPayments();
+  var o={
+    id:nextOrderId++, companyId:cid, companyName:cName,
+    orderName:val('o_name'), date:val('o_date'), manager:val('o_manager'),
+    dueDate:val('o_dueDate'), status:val('o_status'), memo:val('o_memo'),
+    installFee:+val('o_installFee')||0, monthlyFee:+val('o_monthlyFee')||0,
+    billingStart:val('o_billingStart'), fileName:val('o_fileName'),
+    payments: payments, issued: deriveIssued(payments),
+    items:readOrderItems()
+  };
+  orders.push(o); selectedOrderId=o.id; showOrderDetail();
 }
 function updateOrder(){
   var idx=orders.findIndex(function(x){ return x.id===selectedOrderId; }); if(idx<0) return;
-  orders[idx]=Object.assign({},orders[idx],{companyName:val('o_company'),orderName:val('o_name'),date:val('o_date'),manager:val('o_manager'),dueDate:val('o_dueDate'),status:val('o_status'),memo:val('o_memo'),items:readOrderItems()});
-  renderOrderList(); showOrderDetail();
+  var cid = +val('o_companyId')||null;
+  var cName = cid ? (companies.find(function(c){return c.id===cid;})||{}).name||'' : orders[idx].companyName;
+  var payments = readPayments();
+  orders[idx]=Object.assign({},orders[idx],{
+    companyId:cid, companyName:cName,
+    orderName:val('o_name'), date:val('o_date'), manager:val('o_manager'),
+    dueDate:val('o_dueDate'), status:val('o_status'), memo:val('o_memo'),
+    installFee:+val('o_installFee')||0, monthlyFee:+val('o_monthlyFee')||0,
+    billingStart:val('o_billingStart'), fileName:val('o_fileName'),
+    payments: payments, issued: deriveIssued(payments),
+    items:readOrderItems()
+  });
+  showOrderDetail();
 }
 function deleteOrder(){
   var o=orders.find(function(x){ return x.id===selectedOrderId; });
   if(!o||!confirm('"'+o.companyName+' · '+o.orderName+'" 발주서를 삭제하시겠습니까?')) return;
   orders=orders.filter(function(x){ return x.id!==selectedOrderId; });
-  selectedOrderId=null; hideOrderContent(); renderOrderList();
+  selectedOrderId=null;
+  showOrderDashboard();
 }
 
 renderQuoteList();
-renderOrderList();
+renderOrderDashboard();
 </script>
 </body>
 </html>
